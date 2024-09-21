@@ -1,0 +1,45 @@
+data_source: E:/资源汇总/新球磨项目/Data/Daq/$bm$/$shot_2$00/$sensor$/$shot$.hdf5 # 数据地址
+Inference_path: E:/资源汇总/新球磨项目/Data/Inference/$bm$/$shot_2$00/$shot$ # 输出地址
+model_path: E:/资源汇总/新球磨项目/Data/Train/models/$bm$/$sensor$
+alarm_config_path: E:/资源汇总/新球磨项目/Data/Train/$bm$/configs/rms_alarm_config.yml
+rotate_speed: # 转速
+single_output_path: # 单独炮数据输出地址
+summary_path: E:\资源汇总\新球磨项目\Data\Inference\$bm$ # 公共文件路径
+summary_file: summary.json # write to this summary file, not hard coded file name any more
+min_shots: 200
+max_shots: 500
+is_training: True
+training_shots: 500
+
+ball_mills:
+  - name: "bm1" # name of the mill
+    start_sensor: ['sensor1', 'sensor5'] # 检测是否运行参考的传感器
+    start_axis: 'rms_x'  # 检测是否运行时参考的传感器的轴 如rms_x rms_mean
+    min_rms_start: [0.009]   # sensor1
+#  - name: "bm2"
+#    min_rms_start: 0.01   # sensor1
+#  - name: "bm3"
+#    min_rms_start: 0.01   # sensor1
+
+channels:
+  - channel0: x
+  - channel1: y
+  - channel2: z
+
+sensors:
+  - "sensor1" # the prefix for this sensor, all fields of this sensor will have this prefix
+  - "sensor2" # the prefix for this sensor, all fields of this sensor will have this prefix
+  - "sensor3" # the prefix for this sensor, all fields of this sensor will have this prefix
+  - "sensor4" # the prefix for this sensor, all fields of this sensor will have this prefix
+  - "sensor5" # the prefix for this sensor, all fields of this sensor will have this prefix
+  - "sensor6" # the prefix for this sensor, all fields of this sensor will have this prefix
+
+alarms:
+  - window: 10
+  - on: 8
+  - off: 6
+  - minor: 0.9
+  - major: 0.95
+  - fatal: 0.98
+
+
