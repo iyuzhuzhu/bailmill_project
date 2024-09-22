@@ -1,0 +1,4 @@
+[console_scripts]
+fft = FFT.main:main
+masterproc = MasterProc.main:main
+rms = rms.main:main
