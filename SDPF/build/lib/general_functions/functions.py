@@ -6,7 +6,7 @@ import argparse
 import numpy as np
 from datetime import datetime
 import requests
-from collections import OrderedDict
+from pymongo import MongoClient
 from ruamel.yaml import YAML
 
 
@@ -188,42 +188,42 @@ def create_output_folder(output_path, shot, bm):
         pass
 
 
-def single_summary(bm, shot, datatime_float, results, is_running=None):
-    """
-    将单独炮号的信息模型总结
-    :param bm: 球磨机名称 bm1 bm2
-    :param shot: 炮号
-    :param datatime_float: 时间的浮点数 如202408261140
-    :param results: 该炮号的分析结果
-    :param is_running: 该炮号采集时，球磨机是否正在运行
-    :return: 单独炮号分析总结
-    """
-    single_summary = dict()
-    single_summary['bail_mill_name'] = bm
-    single_summary['shot'] = shot
-    single_summary['data_time'] = return_datatime(datatime_float)
-    single_summary['is_running'] = is_running
-    single_summary['results'] = results
-    return single_summary
+# def single_summary(bm, shot, datatime_float, results, is_running=None):
+#     """
+#     将单独炮号的信息模型总结
+#     :param bm: 球磨机名称 bm1 bm2
+#     :param shot: 炮号
+#     :param datatime_float: 时间的浮点数 如202408261140
+#     :param results: 该炮号的分析结果
+#     :param is_running: 该炮号采集时，球磨机是否正在运行
+#     :return: 单独炮号分析总结
+#     """
+#     single_summary = dict()
+#     single_summary['bail_mill_name'] = bm
+#     single_summary['shot'] = shot
+#     single_summary['data_time'] = return_datatime(datatime_float)
+#     single_summary['is_running'] = is_running
+#     single_summary['results'] = results
+#     return single_summary
 
 
-def single_summary_save(bm, shot, datatime_float, results, output_path, model_name, is_running=None):
-    """
-    保存单独炮号数据分析数据
-    :param bm: 球磨机名称 bm1 bm2
-    :param shot: 炮号
-    :param datatime_float: 时间的浮点数 如202408261140
-    :param results: 该炮号的分析结果
-    :param output_path: config中的输出路径 如Inference_path
-    :param model_name: 模型名称 如rms fft ai
-    :param is_running: 数据采集时， 球磨机是否正在运行
-    :return: 单独炮号分析总结
-    """
-    single_summary_dict = single_summary(bm, shot, datatime_float, results, is_running)
-    output_path = create_output_folder(output_path, shot, bm)
-    json_name = 'single_summary' + '_' + model_name + '.json'
-    save_json(single_summary_dict, json_name, output_path)
-    return single_summary_dict
+# def single_summary_save(bm, shot, datatime_float, results, output_path, model_name, is_running=None):
+#     """
+#     保存单独炮号数据分析数据
+#     :param bm: 球磨机名称 bm1 bm2
+#     :param shot: 炮号
+#     :param datatime_float: 时间的浮点数 如202408261140
+#     :param results: 该炮号的分析结果
+#     :param output_path: config中的输出路径 如Inference_path
+#     :param model_name: 模型名称 如rms fft ai
+#     :param is_running: 数据采集时， 球磨机是否正在运行
+#     :return: 单独炮号分析总结
+#     """
+#     single_summary_dict = single_summary(bm, shot, datatime_float, results, is_running)
+#     output_path = create_output_folder(output_path, shot, bm)
+#     json_name = 'single_summary' + '_' + model_name + '.json'
+#     save_json(single_summary_dict, json_name, output_path)
+#     return single_summary_dict
 
 
 def return_single_summary_data(output_path, shot, bm, model_name):
@@ -312,28 +312,20 @@ def save_yaml(data, file_path, ruamel_yaml):
         ruamel_yaml.dump(data, file)
 
 
-def alarm_config_axis(axis, data_list, minor, major, fatal, sensor_threshold):
+def alarm_config_axis(axis, data_list, h, hh, sensor_threshold):
     """
     根据已有的数据列表与异常分位点，得到异常阈值列表
-    :param axis:
+    :param hh: 2级阈值分位点
+    :param h: 1级阈值分位点
+    :param axis: 轴向数据
     :param data_list:
-    :param minor:一级异常分位点
-    :param major:二级异常分位点
-    :param fatal:三级异常分位点
     :param sensor_threshold:异常阈值字典
     :return:
     """
-    minor_threshold = np.percentile(data_list, 100 * minor)
-    major_threshold = np.percentile(data_list, 100 * major)
-    fatal_threshold = np.percentile(data_list, 100 * fatal)
-    if axis[-1] == 'n':
-        sensor_threshold['of_h_avg'] = minor_threshold
-        sensor_threshold['of_hh_avg'] = major_threshold
-        sensor_threshold['of_hhh_avg'] = fatal_threshold
-    else:
-        sensor_threshold['of_h_' + axis[-1]] = minor_threshold
-        sensor_threshold['of_hh_' + axis[-1]] = major_threshold
-        sensor_threshold['of_hhh_' + axis[-1]] = fatal_threshold
+    h_threshold = np.percentile(data_list, 100 * h)
+    hh_threshold = np.percentile(data_list, 100 * hh)
+    sensor_threshold['of_h_' + axis.split("_")[0]] = h_threshold
+    sensor_threshold['of_hh_' + axis.split("_")[0]] = hh_threshold
     return sensor_threshold
 
 
@@ -345,25 +337,19 @@ def order_alarm_dict(sensor_threshold_dict, round_num=5):
     :return:
     """
     for key in sensor_threshold_dict.keys():
-        if key == 'sensor':
+        if key == 'sensor_prefix':
             continue
         else:
             sensor_threshold_dict[key] = convert_to_serializable(sensor_threshold_dict[key], round_num)
             sensor_threshold_dict[key] = convert_floats_to_strings(sensor_threshold_dict[key])
     ordered_data = {
         "sensor_prefix": sensor_threshold_dict['sensor_prefix'],
-        "of_h_x": sensor_threshold_dict["of_h_x"],
-        "of_hh_x": sensor_threshold_dict["of_hh_x"],
-        "of_hhh_x": sensor_threshold_dict["of_hhh_x"],
-        "of_h_y": sensor_threshold_dict["of_h_y"],
-        "of_hh_y": sensor_threshold_dict["of_hh_y"],
-        "of_hhh_y": sensor_threshold_dict["of_hhh_y"],
+        "of_h_r": sensor_threshold_dict["of_h_r"],
+        "of_hh_r": sensor_threshold_dict["of_hh_r"],
         "of_h_z": sensor_threshold_dict["of_h_z"],
         "of_hh_z": sensor_threshold_dict["of_hh_z"],
-        "of_hhh_z": sensor_threshold_dict["of_hhh_z"],
-        "of_h_avg": sensor_threshold_dict["of_h_avg"],
-        "of_hh_avg": sensor_threshold_dict["of_hh_avg"],
-        "of_hhh_avg": sensor_threshold_dict["of_hhh_avg"]
+        "of_h_temp": sensor_threshold_dict["of_h_temp"],
+        "of_hh_temp": sensor_threshold_dict["of_hh_temp"]
     }
     return ordered_data
 
@@ -514,7 +500,8 @@ def get_sensor_alarm_threshold(sensors_threshold, sensor):
     """
     for sensor_threshold in sensors_threshold:
         if sensor_threshold['sensor_prefix'] == sensor:
-            return sensor_threshold
+            sensor_threshold_ = {k: v for k, v in sensor_threshold.items() if k != 'sensor_prefix'}
+            return sensor_threshold_
         else:
             continue
 
@@ -587,6 +574,67 @@ def remove_lower_alarm(alarms):
     alarms, alarms_remove = set(alarms), set(alarms_remove)
     alarms = alarms - alarms_remove
     return list(alarms)
+
+
+def single_shot_summary(bm, shot, sensors, datatime_float, is_running=None):
+    """
+    将单独炮号的信息模型总结，新设计
+    :param sensors: summary sensors信息汇总字典
+    :param bm: 球磨机名称 bm1 bm2
+    :param shot: 炮号
+    :param is_running: 该炮号采集时，球磨机是否正在运行
+    :return: 单独炮号分析总结
+    """
+    single_summary = dict()
+    single_summary['ball_mill_name'] = bm
+    single_summary['shot'] = int(shot)
+    # 获取当前的日期和时间
+    # current_datetime = datetime.now()
+    # # 使用 strftime 方法格式化输出，不包含毫秒部分
+    # formatted_datetime = current_datetime.strftime('%Y-%m-%d %H:%M:%S')
+    single_summary['time'] = return_datatime(datatime_float)
+    single_summary['is_running'] = is_running
+    single_summary['sensors'] = sensors
+    return single_summary
+
+
+def save_single_summary_mongodb(single_summary, address, collection_name, shot, database_name='bm'):
+    """
+    将数据保存到MongoDB数据库,如果当前炮号已被分析，则对已有的结果进行替换
+    :param shot: 炮号
+    :param single_summary: 分析得到的数据
+    :param address: 数据库域名地址
+    :param collection_name: 集合名称
+    :param database_name: 数据库名称
+    :return:
+    """
+    shot = int(shot)
+    # 创建 MongoDB 客户端
+    client = MongoClient(address)
+    # 选择数据库
+    db = client[database_name]
+    # 选择集合
+    collection = db[collection_name]
+    # 创建唯一索引
+    try:
+        collection.create_index("shot", unique=True)
+    except Exception as e:
+        pass
+    # 检查文档是否已经存在
+    existing_document = collection.find_one({"shot": shot})
+    if existing_document:
+        # 替换现有文档
+        result = collection.replace_one({"shot": shot}, single_summary)
+    else:
+        # 插入新文档
+        result = collection.insert_one(single_summary)
+    # 关闭客户端连接
+    client.close()
+
+
+def create_and_save_single_summary(bm, shot, sensors, address, collection_name, database_name, is_running=None):
+    single_summary = single_shot_summary(bm, shot, sensors, is_running)
+    save_single_summary_mongodb(single_summary, address, collection_name, database_name)
 
 
 def save_alarm_config(file_path, alarm_config_data):

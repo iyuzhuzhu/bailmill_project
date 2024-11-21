@@ -1,28 +1,31 @@
 data_source: E:/资源汇总/新球磨项目/Data/Daq/$bm$/$shot_2$00/$sensor$/$shot$.hdf5 # 数据地址
 Inference_path: E:/资源汇总/新球磨项目/Data/Inference/$bm$/$shot_2$00/$shot$ # 输出地址
 model_path: E:/资源汇总/新球磨项目/Data/Train/models/$bm$/$sensor$
-alarm_config_path: E:/资源汇总/新球磨项目/Data/Train/$bm$/configs/rms_alarm_config.yml
+mongodb_address: mongodb://localhost:27017/
+alarm_config_path: E:/资源汇总/新球磨项目/Data/Train/$bm$/configs/rms/rms_alarm_config.yml
+basic_plot_path: E:/资源汇总/新球磨项目/configs/plot_configs/basic_plot_config.yaml
 rotate_speed: # 转速
 single_output_path: # 单独炮数据输出地址
 summary_path: E:/资源汇总/新球磨项目/Data/Inference/$bm$ # 公共文件路径
 summary_file: summary.json # write to this summary file, not hard coded file name any more
 min_shots: 200
 max_shots: 500
+start_time: 3 # 振动局部图开始时间
+end_time: 4
 is_training: false
-training_shots: 500
+training_shots: 5000
 
 ball_mills:
 - name: bm1     # name of the mill
   start_sensor: [sensor1, sensor5]       # 检测是否运行参考的传感器
-  start_axis: rms_x      # 检测是否运行时参考的传感器的轴 如rms_x rms_mean
+  start_axis: r_rms      # 检测是否运行时参考的传感器的轴 如rms_x rms_mean
   min_rms_start:
-  - '0.01341716'
-  - '0.00809372'
-
+  - '0.01515713'
+  - '0.01044902'
 channels:
-- channel0: x
-- channel1: y
-- channel2: z
+- channel1: r
+- channel2: r
+- channel3: z
 
 sensors:
 - sensor1     # the prefix for this sensor, all fields of this sensor will have this prefix

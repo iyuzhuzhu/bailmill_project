@@ -13,14 +13,102 @@ def cross_entropy(p, q):
     return -np.sum(p * np.log(q + 1e-10))  # 添加一个小值避免log(0)
 
 
-p = np.array([0.1, 0.2, 0.3])
-q = np.array([0.1, 0.2, 0.3])
-r = np.array([0.2, 0.4, 0.6])
-t = np.array([0.3, 0.5, 0.7])
-print(cross_entropy(p, q))
-print(cross_entropy(r, q))
-print(cross_entropy(t, q))
-print(cross_entropy(r+t, q))
+from pymongo import MongoClient
+
+# 数据库的连接信息
+connection_string = "mongodb://localhost:27017/"
+db_name = "bm"
+collection_name = "bm1_rms"
+
+# 输入字符串
+input_string = "sensors.sensor1.axis_2_rms"
+fields_to_query = [input_string, "shot"]
+print(fields_to_query)
+# 连接到 MongoDB
+client = MongoClient(connection_string)
+
+# 选择数据库和集合
+db = client[db_name]
+collection = db[collection_name]
+
+# 构建查询条件
+# query = {}
+query = {"is_running": True}
+projection = {field: 1 for field in fields_to_query}
+projection['id'] = 0
+# 查询文档
+documents = collection.find(query, projection).sort("shot", 1)
+i = 0
+# 处理查询结果
+for document in documents:
+    print("找到的文档:", document)
+    i += 1
+    print(i)
+
+# 关闭客户端连接
+client.close()
+# temp = "temp"
+# print(temp.split("_")[0])
+# # 创建 MongoDB 客户端
+# client = MongoClient('mongodb://localhost:27017/')
+#
+# # 选择数据库
+# db = client['bm']
+#
+# # 选择集合
+# collection = db['bm1_rms']
+#
+# # 定义要查询的 shot 值
+# shot_value = 1109201
+#
+# # 查询文档
+# document = collection.find_one({"shot": shot_value})
+#
+# if document:
+#     print("找到的文档:", document)
+#     print(type(document))
+# else:
+#     print("未找到匹配的文档")
+# if document:
+#     print("可")
+# else:
+#     print("No")
+# 关闭客户端连接
+client.close()
+
+# # 删除数据
+# delete_result = collection.delete_one({"name": "Alice"})
+# print("删除的文档数:", delete_result.deleted_count)
+# 关闭客户端连接
+# from datetime import datetime
+#
+# # 获取当前的日期和时间
+# current_datetime = datetime.now()
+#
+# # 使用 strftime 方法格式化输出，不包含毫秒部分
+# formatted_datetime = current_datetime.strftime('%Y-%m-%d %H:%M:%S')
+#
+# # 打印当前的日期和时间
+# print("当前的日期和时间是:", formatted_datetime)
+
+# 如果你只想获取当前的时间，可以这样做：
+# current_time = current_datetime.time()
+# print("当前的时间是:", current_time)
+#
+# single_sensor_rms={'r_rms':1, 'z_rms':2, 'temp':3}
+# index_key = ['r_rms', 'z_rms']
+# sensor_index = {k: single_sensor_rms[k] for k in index_key if k in single_sensor_rms}
+# print(sensor_index)
+# temp = 'temp'
+# print(temp.split("_"))
+# p = np.array([0.1, 0.2, 0.3])
+# q = np.array([0.1, 0.2, 0.3])
+# r = np.array([0.2, 0.4, 0.6])
+# t = np.array([0.3, 0.5, 0.7])
+# print(cross_entropy(p, q))
+# print(cross_entropy(r, q))
+# print(cross_entropy(t, q))
+# print(cross_entropy(r+t, q))
 # values = [False, False, False]
 # result = any(values)
 # print(result)  # 输出: True
