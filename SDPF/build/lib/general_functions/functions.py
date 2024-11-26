@@ -5,7 +5,6 @@ import json
 import argparse
 import numpy as np
 from datetime import datetime
-import requests
 from pymongo import MongoClient
 from ruamel.yaml import YAML
 
@@ -18,10 +17,11 @@ def get_input_params(description):
     """
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('config_path', type=str, help='config path', default='')
+    parser.add_argument('--name', '-n', type=str, help='ball_mill_name', default='')
     parser.add_argument('--shot', '-s', type=str, help='shot', default="")
     args = parser.parse_args()
     # print("参数输入完成")
-    return args.config_path, args.shot
+    return args.config_path, args.name, args.shot
 
 
 def read_config(config_path):
@@ -113,6 +113,35 @@ def get_single_sensor_data(data_source, shot, bm, sensor):
     return sample_data, data
 
 
+def get_sample_time(sample_data):
+    """
+    通过采样数据得到采样时间
+    :param sample_data: 采样的数据
+    :return: 采样时间
+    """
+    try:
+        date_time = sample_data['CreateTime']
+        return date_time
+    except Exception as e:
+        return None
+
+
+def get_sensors_data(data_source, shot, name, sensors):
+    """
+    获取所有传感器的数据
+    """
+    sensors_data = {}
+    sample_data = None
+    for sensor in sensors:
+        try:
+            sample_data, data = get_single_sensor_data(data_source, shot, name, sensor)
+            sensors_data[sensor] = data
+        except Exception as e:
+            sensors_data[sensor] = None
+            continue
+    return sample_data, sensors_data
+
+
 def channel_to_axis(channels_to_axis, channel):
     """
     输入channel0，1，2与x,y,z的对应关系和channel，返回该channel对应的轴向
@@ -168,6 +197,14 @@ def replace_placeholders(string, replacement_params):
     return string
 
 
+def create_folder(folder_path):
+    """
+    创建文件夹
+    """
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
+
+
 def create_output_folder(output_path, shot, bm):
     """
     创建输出的文件夹
@@ -182,48 +219,10 @@ def create_output_folder(output_path, shot, bm):
     output_path = output_path.replace('$bm$', bm)
     # output_path = replace_path(output_path, shot, bm, sensor)
     try:
-        os.makedirs(output_path, exist_ok=True)
+        create_folder(output_path)
         return output_path
     except Exception as e:
         pass
-
-
-# def single_summary(bm, shot, datatime_float, results, is_running=None):
-#     """
-#     将单独炮号的信息模型总结
-#     :param bm: 球磨机名称 bm1 bm2
-#     :param shot: 炮号
-#     :param datatime_float: 时间的浮点数 如202408261140
-#     :param results: 该炮号的分析结果
-#     :param is_running: 该炮号采集时，球磨机是否正在运行
-#     :return: 单独炮号分析总结
-#     """
-#     single_summary = dict()
-#     single_summary['bail_mill_name'] = bm
-#     single_summary['shot'] = shot
-#     single_summary['data_time'] = return_datatime(datatime_float)
-#     single_summary['is_running'] = is_running
-#     single_summary['results'] = results
-#     return single_summary
-
-
-# def single_summary_save(bm, shot, datatime_float, results, output_path, model_name, is_running=None):
-#     """
-#     保存单独炮号数据分析数据
-#     :param bm: 球磨机名称 bm1 bm2
-#     :param shot: 炮号
-#     :param datatime_float: 时间的浮点数 如202408261140
-#     :param results: 该炮号的分析结果
-#     :param output_path: config中的输出路径 如Inference_path
-#     :param model_name: 模型名称 如rms fft ai
-#     :param is_running: 数据采集时， 球磨机是否正在运行
-#     :return: 单独炮号分析总结
-#     """
-#     single_summary_dict = single_summary(bm, shot, datatime_float, results, is_running)
-#     output_path = create_output_folder(output_path, shot, bm)
-#     json_name = 'single_summary' + '_' + model_name + '.json'
-#     save_json(single_summary_dict, json_name, output_path)
-#     return single_summary_dict
 
 
 def return_single_summary_data(output_path, shot, bm, model_name):
@@ -243,47 +242,15 @@ def return_single_summary_data(output_path, shot, bm, model_name):
     return single_summary_data
 
 
-def get_web_is_running(url, data_key='is_running'):
+def get_threshold_config(threshold_config_path, bm):
     """
-    由web_api得到当前炮号is_running的数据
-    :param url: 获取数据的api的url 如"http://localhost:5000/api/get_data"
-    :param data_key: 返回得到的数据字典的数据对应的key
-    :return: 或许到的is_running数据
-    """
-    response = requests.get(url)
-    # 检查请求是否成功
-    if response.status_code == 200:
-        # 将响应内容解析为JSON格式
-        data = response.json()
-        return data[data_key]
-    else:
-        print("Failed to retrieve data. Status code:", response.status_code)
-
-
-def update_web_data(data, url=None, headers=None):
-    """
-    更新网页数据
-    :param data: 需要更新上去的数据
-    :param url: 更新数据的api的url 如"http://localhost:5000/api/update_data"
-    :param headers: 请求头，指定数据格式为 JSON
-    :return:
-    """
-    if headers is None:
-        headers = {'Content-Type': 'application/json'}
-    if url is None:
-        url = "http://localhost:5000/api/update_data"
-    requests.post(url, headers=headers, data=json.dumps(data))
-
-
-def get_alarm_config(alarm_config_path, bm):
-    """
-    得到报警的配置文件信息
+    得到阈值的配置文件信息
     :param: bm 球磨机名称
     :return:
     """
-    alarm_config_path = alarm_config_path.replace('$bm$', bm)
-    alarm_config, ruamel_yaml = load_yaml(alarm_config_path)
-    return alarm_config, ruamel_yaml, alarm_config_path
+    threshold_config_path = threshold_config_path.replace('$bm$', bm)
+    threshold_config, ruamel_yaml = load_yaml(threshold_config_path)
+    return threshold_config, ruamel_yaml, threshold_config_path
 
 
 def load_yaml(file_path):
@@ -336,22 +303,10 @@ def order_alarm_dict(sensor_threshold_dict, round_num=5):
     :param sensor_threshold_dict:
     :return:
     """
-    for key in sensor_threshold_dict.keys():
-        if key == 'sensor_prefix':
-            continue
-        else:
-            sensor_threshold_dict[key] = convert_to_serializable(sensor_threshold_dict[key], round_num)
-            sensor_threshold_dict[key] = convert_floats_to_strings(sensor_threshold_dict[key])
-    ordered_data = {
-        "sensor_prefix": sensor_threshold_dict['sensor_prefix'],
-        "of_h_r": sensor_threshold_dict["of_h_r"],
-        "of_hh_r": sensor_threshold_dict["of_hh_r"],
-        "of_h_z": sensor_threshold_dict["of_h_z"],
-        "of_hh_z": sensor_threshold_dict["of_hh_z"],
-        "of_h_temp": sensor_threshold_dict["of_h_temp"],
-        "of_hh_temp": sensor_threshold_dict["of_hh_temp"]
-    }
-    return ordered_data
+    for axis, threshold in sensor_threshold_dict.items():
+        sensor_threshold_dict[axis] = convert_to_serializable(threshold, round_num)
+        sensor_threshold_dict[axis] = convert_floats_to_strings(sensor_threshold_dict[axis])
+    return sensor_threshold_dict
 
 
 def convert_to_serializable(data, round_num):
@@ -376,121 +331,6 @@ def convert_floats_to_strings(data):
     return data
 
 
-def get_last_alarm(output_path, shot, bm, model_name, sensor):
-    """
-    返回当前炮号的上一炮的对应的传感器results的alarm:对应的值
-    :param output_path: 输出地址（含被替换部分）config['Inference_path']部分
-    :param shot: 返回的炮号
-    :param bm: 球磨机名称
-    :param model_name: 模型名称 如rms fft
-    :param sensor: 传感器名称
-    :return:
-    """
-    try:
-        shot = str(int(shot) - 1)
-        last_shot_summary = return_single_summary_data(output_path, shot, bm, model_name)
-        last_results = last_shot_summary['results']
-        for last_result in last_results:
-            if last_result['sensor'] == sensor:
-                return last_result['alarm']
-            else:
-                continue
-    except Exception as e:
-        return None
-
-
-def alarm_str_to_level(alarm_str):
-    """
-    将报警字符返回报警等级 如sensor1_x_major返回2
-    :param alarm_str:
-    :return:
-    """
-    if alarm_str[-5:] == 'minor':
-        return 1
-    elif alarm_str[-5:] == 'major':
-        return 2
-    elif alarm_str[-5:] == 'fatal':
-        return 3
-
-
-def transform_alarm_to_bool(alarm, alarm_threshold_key):
-    """
-    通过json数据读取出来的alarm列表，返回输入的alarm-config中的sensor_threshold中的阈值对应异常级别是否在上次是异常
-    :param alarm:
-    :param alarm_threshold_key: alarm_config中的sensor_threshold 如of_hh_x
-    :return:
-    """
-    if not alarm:
-        return False
-    for alarm_ in alarm:
-        if alarm_.split('_')[1] == alarm_threshold_key.split('_')[2]:
-            if alarm_str_to_level(alarm_) >= alarm_threshold_key.count('h'):
-                return True
-    return False
-
-
-def get_last_alarm_state(output_path, shot, bm, model_name, sensor, alarm_threshold_key):
-    """
-    返回输入的alarm-config中的sensor_threshold中的阈值对应异常级别是否在上次是异常 True表示异常
-    :param output_path: 输出地址（含被替换部分）config['Inference_path']部分
-    :param shot: 返回的炮号
-    :param bm: 球磨机名称
-    :param model_name: 模型名称 如rms fft
-    :param sensor: 传感器名称
-    :param alarm_threshold_key:
-    :return:
-    """
-    last_alarm = get_last_alarm(output_path, shot, bm, model_name, sensor)
-    last_alarm_state = transform_alarm_to_bool(last_alarm, alarm_threshold_key)
-    return last_alarm_state
-
-
-def single_hysteresis_alarm(data, threshold, window, on, off, last_alarm_state=None):
-    """
-    针对于单个传感器的轴，进行滞环报警，如果已有数据不足则不报警
-    :param data: 异常指数数据
-    :param threshold: 阈值
-    :param window: 数据需要的窗口
-    :param on: 上一炮未报警时，异常指数序列中异常数阈值
-    :param off: 上一炮报警时，异常指数序列中异常数阈值
-    :param last_alarm_state: 上一炮的报警状态
-    :return: 报警，若为True则报警，反之则不报警
-    """
-    if len(data) < window:
-        return None
-    alarm_shot_num = 0
-    for i in data:
-        if i >= float(threshold):
-            alarm_shot_num += 1
-    # print(alarm_shot_num)
-    if last_alarm_state:
-        if alarm_shot_num >= off:
-            return True
-        else:
-            return False
-    else:
-        if alarm_shot_num >= on:
-            return True
-        else:
-            return False
-
-
-def transform_alarm_bool(alarm_state, alarm_level, sensor, axis):
-    """
-    根据报警情况，以及报警等级，传感器与轴，返回报警字符串 如sensor1_x_major
-    :param alarm_state: 是否报警 True or False or None(None表示目前无法判断是否报警）
-    :param alarm_level: 报警等级 minor major fatal
-    :param sensor: 传感器名称 senor1
-    :param axis:
-    :return:
-    """
-    if alarm_state:
-        alarm = sensor + '_' + axis + '_' + alarm_level
-        return alarm
-    else:
-        return False
-
-
 def get_sensor_alarm_threshold(sensors_threshold, sensor):
     """
     取出alarm_config对应传感器的sensor_threshold
@@ -504,76 +344,6 @@ def get_sensor_alarm_threshold(sensors_threshold, sensor):
             return sensor_threshold_
         else:
             continue
-
-
-def return_final_format_alarms(alarms):
-    """
-    将报警中本来的1，2，3级别报警替换成minor，major，fatal,并按照xyz轴顺序排列故障
-    :param alarms: 报警列表
-    :return: 字符 char 在字符串 s 中出现的次数
-    """
-    alarms_ = []
-    for alarm in alarms:
-        if alarm[-1] == '1':
-            alarm_ = alarm[:-1] + 'minor'
-        elif alarm[-1] == '2':
-            alarm_ = alarm[:-1] + 'major'
-        elif alarm[-1] == '3':
-            alarm_ = alarm[:-1] + 'fatal'
-        alarms_.append(alarm_)
-    sorted_alarms = sorted(alarms_, key=lambda element: element.split('_')[1])
-    return sorted_alarms
-
-
-def single_sensor_alarm(output_path, shot, bm, model_name, data, sensor_threshold, window, on, off):
-    """
-    得到异常状态的列表
-    :param output_path: 输出地址（含被替换部分）config['Inference_path']部分
-    :param shot: 返回的炮号
-    :param bm: 球磨机名称
-    :param model_name: 模型名称 如rms fft
-    :param data: 当前炮号开始的window
-    :param sensor_threshold: alarm_config中sensors_threshold的列表单个字典元素
-    :param window:
-    :param on:
-    :param off:
-    :return:
-    """
-    alarms, sensor = [], sensor_threshold['sensor_prefix']
-    for key, threshold in sensor_threshold.items():
-        if key == 'sensor_prefix' or key[-1] == 'g':
-            continue
-        else:
-            for axis, data_list in data.items():
-                if axis.split('_')[1] == key.split('_')[2]:
-                    last_alarm_state = get_last_alarm_state(output_path, shot, bm, model_name, sensor, key)
-                    alarm_state = single_hysteresis_alarm(data_list, threshold, window, on, off, last_alarm_state)
-                    if alarm_state:
-                        alarm_level = str(key.count('h'))  # 通过h数量判定几级异常阈值
-                        alarm = transform_alarm_bool(alarm_state, alarm_level, sensor, key[-1])
-                        alarms.append(alarm)
-                    else:
-                        continue
-    alarms = remove_lower_alarm(alarms)
-    alarms = return_final_format_alarms(alarms)
-    return alarms
-
-
-def remove_lower_alarm(alarms):
-    """
-    报了高级的警则将低级的警剔除
-    :param alarms:
-    :return:
-    """
-    alarms_remove = []
-    for alarm in alarms:
-        # print(alarm[-1])
-        for alarm_ in alarms:
-            if alarm[:-1] == alarm_[:-1] and int(alarm[-1]) < int(alarm_[-1]):
-                alarms_remove.append(alarm)
-    alarms, alarms_remove = set(alarms), set(alarms_remove)
-    alarms = alarms - alarms_remove
-    return list(alarms)
 
 
 def single_shot_summary(bm, shot, sensors, datatime_float, is_running=None):
@@ -598,6 +368,16 @@ def single_shot_summary(bm, shot, sensors, datatime_float, is_running=None):
     return single_summary
 
 
+def ensure_unique_index(collection, index_name):
+    # 检查索引是否已经存在
+    if not any(index['name'] == f'{index_name}_1' for index in collection.list_indexes()):
+        # 如果不存在，则创建唯一索引
+        try:
+            collection.create_index([(index_name, 1)], unique=True)
+        except Exception as e:
+            pass
+
+
 def save_single_summary_mongodb(single_summary, address, collection_name, shot, database_name='bm'):
     """
     将数据保存到MongoDB数据库,如果当前炮号已被分析，则对已有的结果进行替换
@@ -615,11 +395,8 @@ def save_single_summary_mongodb(single_summary, address, collection_name, shot, 
     db = client[database_name]
     # 选择集合
     collection = db[collection_name]
-    # 创建唯一索引
-    try:
-        collection.create_index("shot", unique=True)
-    except Exception as e:
-        pass
+    # 确定是否已经创建唯一shot索引， 若无创建唯一索引
+    ensure_unique_index(collection, 'shot')
     # 检查文档是否已经存在
     existing_document = collection.find_one({"shot": shot})
     if existing_document:
@@ -630,6 +407,7 @@ def save_single_summary_mongodb(single_summary, address, collection_name, shot, 
         result = collection.insert_one(single_summary)
     # 关闭客户端连接
     client.close()
+
 
 
 def create_and_save_single_summary(bm, shot, sensors, address, collection_name, database_name, is_running=None):

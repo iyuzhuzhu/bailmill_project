@@ -20,10 +20,10 @@ connection_string = "mongodb://localhost:27017/"
 db_name = "bm"
 collection_name = "bm1_rms"
 
-# 输入字符串
-input_string = "sensors.sensor1.axis_2_rms"
-fields_to_query = [input_string, "shot"]
-print(fields_to_query)
+# # 输入字符串
+# input_string = "sensors.sensor1.axis_2_rms"
+# fields_to_query = [input_string, "shot"]
+# print(fields_to_query)
 # 连接到 MongoDB
 client = MongoClient(connection_string)
 
@@ -33,17 +33,14 @@ collection = db[collection_name]
 
 # 构建查询条件
 # query = {}
-query = {"is_running": True}
-projection = {field: 1 for field in fields_to_query}
-projection['id'] = 0
+query = {"shot": 1108200}
+# projection = {field: 1 for field in fields_to_query}
+# projection['id'] = 0
 # 查询文档
-documents = collection.find(query, projection).sort("shot", 1)
-i = 0
+documents = collection.find(query)
 # 处理查询结果
 for document in documents:
     print("找到的文档:", document)
-    i += 1
-    print(i)
 
 # 关闭客户端连接
 client.close()

@@ -10,6 +10,7 @@ SDPF.egg-info/entry_points.txt
 SDPF.egg-info/top_level.txt
 general_functions/__init__.py
 general_functions/functions.py
+general_functions/plots.py
 rms/__init__.py
 rms/main.py
 rms/main2.py
