@@ -1,9 +1,11 @@
 # database_config.yml
 Tasks:
-  - command: fft
-    config_file: E:\ROS\Bailmill_project\Bailmill2\sdpf\code\SDPF\FFT\config.yml
-    prog: -s
-    parameters: "$shot$"
+  - command: rms
+    config_file: E:\ROS\Bailmill_project\Bailmill2\sdpf\code\SDPF\rms\config.yml
+    prog1: -n
+    parameters1: "$name$"
+    prog2: -s
+    parameters2: "$shot$"
 
 #  - command: ping
 #    config_file: 192.168.1.123

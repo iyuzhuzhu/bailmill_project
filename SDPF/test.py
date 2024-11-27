@@ -19,31 +19,67 @@ from pymongo import MongoClient
 connection_string = "mongodb://localhost:27017/"
 db_name = "bm"
 collection_name = "bm1_rms"
+from pymongo import MongoClient
 
+# 数据库连接信息
+db_config = {
+    "connection": "mongodb://localhost:27017/",
+    "db_name": "bm",
+    "collection": "bm1_rms"
+}
+
+# 输入
+input_query = "bm1_rms>sensors.sensor1.r_rms"
+
+
+def get_mongodb_data(db_config, input_query, limit=10):
+    # 解析输入
+    collection_name, field_path = input_query.split('>')
+
+    # 建立数据库连接
+    client = MongoClient(db_config["connection"])
+    db = client[db_config["db_name"]]
+    collection = db[collection_name]
+
+    # 构建查询条件
+    query = {"is_running": True}
+
+    # 构建投影
+    projection = {field_path: 1, "shot": 1, "_id": 0}  # 需要包含_id以便排序
+    # 执行查询，并按"shot"字段排序
+    results = list(collection.find(query, projection).sort("shot", -1).limit(limit))  # 1 表示升序，-1 表示降序
+    client.close()
+    return results
+
+
+# 调用函数并打印结果
+results = get_mongodb_data(db_config, input_query, limit=5)  # 指定返回5条记录
+for result in results:
+    print(result)
 # # 输入字符串
 # input_string = "sensors.sensor1.axis_2_rms"
 # fields_to_query = [input_string, "shot"]
 # print(fields_to_query)
 # 连接到 MongoDB
-client = MongoClient(connection_string)
-
-# 选择数据库和集合
-db = client[db_name]
-collection = db[collection_name]
-
-# 构建查询条件
-# query = {}
-query = {"shot": 1108200}
-# projection = {field: 1 for field in fields_to_query}
-# projection['id'] = 0
-# 查询文档
-documents = collection.find(query)
-# 处理查询结果
-for document in documents:
-    print("找到的文档:", document)
+# client = MongoClient(connection_string)
+#
+# # 选择数据库和集合
+# db = client[db_name]
+# collection = db[collection_name]
+#
+# # 构建查询条件
+# # query = {}
+# query = {"shot": 1108200}
+# # projection = {field: 1 for field in fields_to_query}
+# # projection['id'] = 0
+# # 查询文档
+# documents = collection.find(query)
+# # 处理查询结果
+# for document in documents:
+#     print("找到的文档:", document)
 
 # 关闭客户端连接
-client.close()
+# client.close()
 # temp = "temp"
 # print(temp.split("_")[0])
 # # 创建 MongoDB 客户端
@@ -71,7 +107,7 @@ client.close()
 # else:
 #     print("No")
 # 关闭客户端连接
-client.close()
+# client.close()
 
 # # 删除数据
 # delete_result = collection.delete_one({"name": "Alice"})

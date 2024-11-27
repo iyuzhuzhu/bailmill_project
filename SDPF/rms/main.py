@@ -25,6 +25,7 @@ class Rms:
         sample_data, sensors_data = functions.get_sensors_data(self.data_source, self.shot, self.name,
                                                                self.sensors)
         self.single_shot_summary(sensors_data, sample_data)
+        # if self.is_running:
         self.plot_model(sensors_data, sample_data)
         print(self.shot)
 
@@ -381,8 +382,6 @@ class Rms:
     def get_single_sensor_result(single_sensor_rms=None, err=False):
         """
         返回单个sensor计算rms的结果，如果sensor计算rms报错则返回各个结果为None的字典
-        :param alarm:
-        :param sensor: 传感器名称
         :param single_sensor_rms: 正常情况下，没有计算报错得到的sensor_rms数据
         :param err: 有没有发生计算故障 False为未发生故障
         :return: 单个sensor的result
@@ -408,7 +407,7 @@ def ball_mill_rms():
     # config_path, name, shot = functions.get_input_params('rms')
     config_path = './config.yml'
     name = 'bm1'
-    shot = '1108200'
+    shot = '1108260'
     config = functions.read_config(config_path)
     # Rms(name, config_path, shot)
     # 得到bail_mill中的bail_name
@@ -423,15 +422,15 @@ def test_shots_calculate():
     config = functions.read_config(config_path)
     # 得到bail_mill中的bail_name
 
-    shots = np.arange(1108200, 1110400)
+    shots = np.arange(1108400, 1110400)
     for shot in shots:
         shot = str(shot)
         Rms(name, config_path, shot)
 
 
 def main():
-    # test_shots_calculate()
-    ball_mill_rms()
+    test_shots_calculate()
+    # ball_mill_rms()
 
 
 if __name__ == '__main__':

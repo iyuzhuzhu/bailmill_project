@@ -28,7 +28,7 @@ def limit_x_y(x_min='-', x_max="-", y_min="-", y_max="-"):
         plt.ylim(top=y_max)
 
 
-def plot(x, y, x_label, y_label, title, save_path, x_min='_', x_max="_", y_min="_", y_max="_",
+def plot(x, y, x_label, y_label, title, save_path, x_min='-', x_max="-", y_min="-", y_max="-",
          font='SimHei', linewidth=1.5, bwith=3, linestyle='-', color='r', size=(12, 6), unicode_minus=False):
     """
     基础绘制图像

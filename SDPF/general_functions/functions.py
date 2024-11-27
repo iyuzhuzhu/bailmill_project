@@ -48,19 +48,6 @@ def get_prefix_address(path, split='$bm$'):
     return prefix_address
 
 
-def get_bail_names(path):
-    """
-    得到球磨机的名称与数目，此处默认球磨机命名bm1 bm2....
-    :param path: config文件中的data_source地址
-    :return:球磨机名称列表
-    """
-    prefix_address = get_prefix_address(path, split='$bm$')
-    entries = os.listdir(prefix_address)
-    # 检查每个条目是否为目录，并收集它们
-    bail_names = [entry for entry in entries if entry[:2] == 'bm']
-    return bail_names
-
-
 def replace_path(data_source, shot, bm, sensor):
     """
     :param data_source: config文件中的datasource,Inference等数据存放地
@@ -76,6 +63,10 @@ def replace_path(data_source, shot, bm, sensor):
     data_source = data_source.replace('$sensor$', sensor)
     # print(data_source)
     return data_source
+
+
+def replace_wildcard():
+    pass
 
 
 def read_hdf5(data_path):
@@ -407,7 +398,6 @@ def save_single_summary_mongodb(single_summary, address, collection_name, shot, 
         result = collection.insert_one(single_summary)
     # 关闭客户端连接
     client.close()
-
 
 
 def create_and_save_single_summary(bm, shot, sensors, address, collection_name, database_name, is_running=None):

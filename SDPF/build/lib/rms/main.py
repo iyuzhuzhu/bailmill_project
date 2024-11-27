@@ -3,7 +3,6 @@ import numpy as np
 from pymongo import MongoClient
 from general_functions import functions, plots
 import os
-from matplotlib import pyplot as plt
 
 
 def calculate_rms(data):
@@ -204,7 +203,7 @@ class Rms:
 
     def plot_model(self, sensors_data=None, sample_data=None):
         """
-        绘制振动波形图像
+        绘制振动波形图像，并复制plot_desc文件
         """
         # sample_data, sensors_data = functions.get_sensors_data(self.data_source, self.shot, self.name, self.sensors)
         plot_config_data = self.get_plot_config()
@@ -212,7 +211,7 @@ class Rms:
         output_path = functions.create_output_folder(self.config['Inference_path'], self.shot, self.name)
         output_folder = os.path.join(output_path, save_plot_folder)
         functions.create_folder(output_folder)
-
+        plots.copy_file(self.config['plot_desc_path'], output_folder)  # 复制plot_desc
         for plot_data in plot_config_data['plots']:
             sensor = plot_data['name']
             channel = plot_data['plot_channel']
@@ -404,38 +403,35 @@ class Rms:
         return sensor_result
 
 
-def all_ball_mills_rms():
+def ball_mill_rms():
     # # 输入参数
-    # config_path, name, shot = functions.get_input_params('rms')
-    config_path = './config.yml'
-    name = 'bm1'
-    shot = '1108200'
+    config_path, name, shot = functions.get_input_params('rms')
+    # config_path = './config.yml'
+    # name = 'bm1'
+    # shot = '1108200'
     config = functions.read_config(config_path)
     # Rms(name, config_path, shot)
     # 得到bail_mill中的bail_name
-    ball_names = [mill['name'] for mill in config['ball_mills']]
-    for name in ball_names:
-        Rms(name, config_path, shot)
+    Rms(name, config_path, shot)
 
 
 def test_shots_calculate():
     # # 输入参数
-    # config_path, shot = functions.get_input_params('rms')
+    # config_path, name, shot = functions.get_input_params('rms')
     config_path = './config.yml'
+    name = 'bm1'
     config = functions.read_config(config_path)
     # 得到bail_mill中的bail_name
-    bail_names = [mill['name'] for mill in config['ball_mills']]
 
     shots = np.arange(1108200, 1110400)
     for shot in shots:
         shot = str(shot)
-        for name in bail_names:
-            Rms(name, config_path, shot)
+        Rms(name, config_path, shot)
 
 
 def main():
     # test_shots_calculate()
-    all_ball_mills_rms()
+    ball_mill_rms()
 
 
 if __name__ == '__main__':
