@@ -9,8 +9,8 @@ setup(
     entry_points={
         'console_scripts': [
             'masterproc = MasterProc.main:main',
-            'fft = FFT.main:main',
-            'rms = rms.main:main'
+            'rms = rms.main:main',
+            'trend = trend.main:main'
         ]
     },
     author='J-TEXT 103',

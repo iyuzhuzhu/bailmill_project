@@ -48,17 +48,40 @@ def get_prefix_address(path, split='$bm$'):
     return prefix_address
 
 
-def get_bail_names(path):
+def replace_string(string, replacement, key):
     """
-    得到球磨机的名称与数目，此处默认球磨机命名bm1 bm2....
-    :param path: config文件中的data_source地址
-    :return:球磨机名称列表
+    替换字符串中$key$对应的部分为replacement
+    :param string: 被替换的字符串
+    :param replacement: 替换的内容
+    :param key: 被替换的关键字 如$bm$ bm为被替换的关键字
+    :return:
     """
-    prefix_address = get_prefix_address(path, split='$bm$')
-    entries = os.listdir(prefix_address)
-    # 检查每个条目是否为目录，并收集它们
-    bail_names = [entry for entry in entries if entry[:2] == 'bm']
-    return bail_names
+    replacement_key = f"${key}$"
+    string = string.replace(replacement_key, replacement)
+    return string
+
+
+def replace_ball_mill_name(string, ball_mill_name):
+    string = replace_string(string, ball_mill_name, 'bm')
+    return string
+
+
+def replace_sensor(string, sensor):
+    string = replace_string(string, sensor, 'sensor')
+    return string
+
+
+def replace_shot_100(string, shot):
+    """
+    替换炮号，分为shot_2和shot两部分，shot_2表示每一百炮存一个文档
+    :param string:
+    :param shot:
+    :return:
+    """
+    shot_2 = int(int(shot) / 100)
+    string = replace_string(string, str(shot_2), 'shot_2')
+    string = replace_string(string, str(shot), 'shot')
+    return string
 
 
 def replace_path(data_source, shot, bm, sensor):
@@ -76,6 +99,11 @@ def replace_path(data_source, shot, bm, sensor):
     data_source = data_source.replace('$sensor$', sensor)
     # print(data_source)
     return data_source
+
+
+def split_string(string, separate_identifier):
+    string_list = string.split(separate_identifier)
+    return string_list
 
 
 def read_hdf5(data_path):
@@ -407,7 +435,6 @@ def save_single_summary_mongodb(single_summary, address, collection_name, shot, 
         result = collection.insert_one(single_summary)
     # 关闭客户端连接
     client.close()
-
 
 
 def create_and_save_single_summary(bm, shot, sensors, address, collection_name, database_name, is_running=None):

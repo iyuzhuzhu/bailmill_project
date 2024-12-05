@@ -2,43 +2,195 @@ db: # 数据库的连接信息
     connection: "mongodb://localhost:27017/"
     db_name: "bm"
     collection: "$bm$_rms"
-output_base_path: "/output/bm1/$shot_2$00/$shot_0$/trend_plot/" #这一个配置下的所有的trend都输出到这一个目录下
+
+output_base_path: "E:/资源汇总/新球磨项目/Data/Inference/$bm$/$shot_2$00/$shot$/trend_plot/" #这一个配置下的所有的trend都输出到这一个目录下
 gui_config_file: /config/gui_trend_rms.json #每次画完图，把这个复制到输出的文件夹下.output_base_path
-sort_index: "$bm$_rms>shot" # 确定绘制哪一次采集的参数
-x_input: "$bm$_rms>time" # 绘制图像的
+
+x_input: "$bm$_rms>time" # 绘制图像的横坐标
 inputs:
     - "$bm$_rms>sensors.sensor1.r_rms" # >前面是collection名字，后面是读出类的记录里面的路径，找到当前记录报警的级别
-#    - "$bm$_rms>sensors.sensor1.z_rms" # >前面是collection名字，后面是读出类的记录里面的路径，找到当前记录报警的级别
-#    - "$bm$_rms>sensors.sensor1.temp" # >前面是collection名字，后面是读出类的记录里面的路径，找到当前记录报警的级别
-#    - "$bm$_rms>sensors.sensor2.r_rms" # >前面是collection名字，后面是读出类的记录里面的路径，找到当前记录报警的级别
-#    - "$bm$_rms>sensors.sensor2.z_rms" # >前面是collection名字，后面是读出类的记录里面的路径，找到当前记录报警的级别
-#    - "$bm$_rms>sensors.sensor2.temp" # >前面是collection名字，后面是读出类的记录里面的路径，找到当前记录报警的级别
-#    - "$bm$_rms>sensors.sensor3.r_rms" # >前面是collection名字，后面是读出类的记录里面的路径，找到当前记录报警的级别
-#    - "$bm$_rms>sensors.sensor3.z_rms" # >前面是collection名字，后面是读出类的记录里面的路径，找到当前记录报警的级别
-#    - "$bm$_rms>sensors.sensor3.temp" # >前面是collection名字，后面是读出类的记录里面的路径，找到当前记录报警的级别
-#    - "$bm$_rms>sensors.sensor4.r_rms" # >前面是collection名字，后面是读出类的记录里面的路径，找到当前记录报警的级别
-#    - "$bm$_rms>sensors.sensor4.z_rms" # >前面是collection名字，后面是读出类的记录里面的路径，找到当前记录报警的级别
-#    - "$bm$_rms>sensors.sensor4.temp" # >前面是collection名字，后面是读出类的记录里面的路径，找到当前记录报警的级别
-#    - "$bm$_rms>sensors.sensor5.r_rms" # >前面是collection名字，后面是读出类的记录里面的路径，找到当前记录报警的级别
-#    - "$bm$_rms>sensors.sensor5.z_rms" # >前面是collection名字，后面是读出类的记录里面的路径，找到当前记录报警的级别
-#    - "$bm$_rms>sensors.sensor5.temp" # >前面是collection名字，后面是读出类的记录里面的路径，找到当前记录报警的级别
-#    - "$bm$_rms>sensors.sensor6.r_rms" # >前面是collection名字，后面是读出类的记录里面的路径，找到当前记录报警的级别
-#    - "$bm$_rms>sensors.sensor6.z_rms" # >前面是collection名字，后面是读出类的记录里面的路径，找到当前记录报警的级别
-#    - "$bm$_rms>sensors.sensor6.temp" # >前面是collection名字，后面是读出类的记录里面的路径，找到当前记录报警的级别
+    - "$bm$_rms>sensors.sensor1.z_rms" # >前面是collection名字，后面是读出类的记录里面的路径，找到当前记录报警的级别
+    - "$bm$_rms>sensors.sensor1.temp" # >前面是collection名字，后面是读出类的记录里面的路径，找到当前记录报警的级别
+    - "$bm$_rms>sensors.sensor2.r_rms" # >前面是collection名字，后面是读出类的记录里面的路径，找到当前记录报警的级别
+    - "$bm$_rms>sensors.sensor2.z_rms" # >前面是collection名字，后面是读出类的记录里面的路径，找到当前记录报警的级别
+    - "$bm$_rms>sensors.sensor2.temp" # >前面是collection名字，后面是读出类的记录里面的路径，找到当前记录报警的级别
+    - "$bm$_rms>sensors.sensor3.r_rms" # >前面是collection名字，后面是读出类的记录里面的路径，找到当前记录报警的级别
+    - "$bm$_rms>sensors.sensor3.z_rms" # >前面是collection名字，后面是读出类的记录里面的路径，找到当前记录报警的级别
+    - "$bm$_rms>sensors.sensor3.temp" # >前面是collection名字，后面是读出类的记录里面的路径，找到当前记录报警的级别
+    - "$bm$_rms>sensors.sensor4.r_rms" # >前面是collection名字，后面是读出类的记录里面的路径，找到当前记录报警的级别
+    - "$bm$_rms>sensors.sensor4.z_rms" # >前面是collection名字，后面是读出类的记录里面的路径，找到当前记录报警的级别
+    - "$bm$_rms>sensors.sensor4.temp" # >前面是collection名字，后面是读出类的记录里面的路径，找到当前记录报警的级别
+    - "$bm$_rms>sensors.sensor5.r_rms" # >前面是collection名字，后面是读出类的记录里面的路径，找到当前记录报警的级别
+    - "$bm$_rms>sensors.sensor5.z_rms" # >前面是collection名字，后面是读出类的记录里面的路径，找到当前记录报警的级别
+    - "$bm$_rms>sensors.sensor5.temp" # >前面是collection名字，后面是读出类的记录里面的路径，找到当前记录报警的级别
+    - "$bm$_rms>sensors.sensor6.r_rms" # >前面是collection名字，后面是读出类的记录里面的路径，找到当前记录报警的级别
+    - "$bm$_rms>sensors.sensor6.z_rms" # >前面是collection名字，后面是读出类的记录里面的路径，找到当前记录报警的级别
+    - "$bm$_rms>sensors.sensor6.temp" # >前面是collection名字，后面是读出类的记录里面的路径，找到当前记录报警的级别
 outputs: #这个要和input数量对应
     - file_name: "sensor1_r_rms.png"
       point_min: 10
-      point_max: 100
-      line_color: "#26241e"
+      point_max: 150
+      line_color: "#0000FF"
       back_color: "#ffffff"
       line_width: 3
       x_label: "时间"
+      y_label: "加速度"
       title: "sensor1_径向振动均方根趋势" #还有很多画图的配置，你参考原来老艾的设计和配置文件
-#    - name: sensor2_axis_2_rms
-#      file_name: "sensor2_axis_2_rms.png"
-#      point_min: 10
-#      point_max: 100
-#      line_col: "#26241e"
-#      back_col: "#ffffff"
-#      line_width: 5
-#      title: "xxx振幅趋势" #还有很多画图的配置，你参考原来老艾的设计和配置文件
+    - file_name: "sensor1_z_rms.png"
+      point_min: 10
+      point_max: 150
+      line_color: "#0000FF"
+      back_color: "#ffffff"
+      line_width: 3
+      x_label: "时间"
+      y_label: "加速度"
+      title: "sensor1_轴向振动均方根趋势"
+    - file_name: "sensor1_temp.png"
+      point_min: 10
+      point_max: 150
+      line_color: "#0000FF"
+      back_color: "#ffffff"
+      line_width: 3
+      x_label: "时间"
+      y_label: "温度"
+      title: "sensor1_温度趋势"
+
+    - file_name: "sensor2_r_rms.png"
+      point_min: 10
+      point_max: 150
+      line_color: "#0000FF"
+      back_color: "#ffffff"
+      line_width: 3
+      x_label: "时间"
+      y_label: "加速度"
+      title: "sensor2_径向振动均方根趋势" #还有很多画图的配置，你参考原来老艾的设计和配置文件
+    - file_name: "sensor2_z_rms.png"
+      point_min: 10
+      point_max: 150
+      line_color: "#0000FF"
+      back_color: "#ffffff"
+      line_width: 3
+      x_label: "时间"
+      y_label: "加速度"
+      title: "sensor2_轴向振动均方根趋势"
+    - file_name: "sensor2_temp.png"
+      point_min: 10
+      point_max: 150
+      line_color: "#0000FF"
+      back_color: "#ffffff"
+      line_width: 3
+      x_label: "时间"
+      y_label: "温度"
+      title: "sensor2_温度趋势"
+
+    - file_name: "sensor3_r_rms.png"
+      point_min: 10
+      point_max: 150
+      line_color: "#0000FF"
+      back_color: "#ffffff"
+      line_width: 3
+      x_label: "时间"
+      y_label: "加速度"
+      title: "sensor3_径向振动均方根趋势" #还有很多画图的配置，你参考原来老艾的设计和配置文件
+    - file_name: "sensor3_z_rms.png"
+      point_min: 10
+      point_max: 150
+      line_color: "#0000FF"
+      back_color: "#ffffff"
+      line_width: 3
+      x_label: "时间"
+      y_label: "加速度"
+      title: "sensor3_轴向振动均方根趋势"
+    - file_name: "sensor3_temp.png"
+      point_min: 10
+      point_max: 150
+      line_color: "#0000FF"
+      back_color: "#ffffff"
+      line_width: 3
+      x_label: "时间"
+      y_label: "温度"
+      title: "sensor3_温度趋势"
+
+    - file_name: "sensor4_r_rms.png"
+      point_min: 10
+      point_max: 150
+      line_color: "#0000FF"
+      back_color: "#ffffff"
+      line_width: 3
+      x_label: "时间"
+      y_label: "加速度"
+      title: "sensor4_径向振动均方根趋势" #还有很多画图的配置，你参考原来老艾的设计和配置文件
+    - file_name: "sensor4_z_rms.png"
+      point_min: 10
+      point_max: 150
+      line_color: "#0000FF"
+      back_color: "#ffffff"
+      line_width: 3
+      x_label: "时间"
+      y_label: "加速度"
+      title: "sensor4_轴向振动均方根趋势"
+    - file_name: "sensor4_temp.png"
+      point_min: 10
+      point_max: 150
+      line_color: "#0000FF"
+      back_color: "#ffffff"
+      line_width: 3
+      x_label: "时间"
+      y_label: "温度"
+      title: "sensor4_温度趋势"
+
+    - file_name: "sensor5_r_rms.png"
+      point_min: 10
+      point_max: 150
+      line_color: "#0000FF"
+      back_color: "#ffffff"
+      line_width: 3
+      x_label: "时间"
+      y_label: "加速度"
+      title: "sensor5_径向振动均方根趋势" #还有很多画图的配置，你参考原来老艾的设计和配置文件
+    - file_name: "sensor5_z_rms.png"
+      point_min: 10
+      point_max: 150
+      line_color: "#0000FF"
+      back_color: "#ffffff"
+      line_width: 3
+      x_label: "时间"
+      y_label: "加速度"
+      title: "sensor5_轴向振动均方根趋势"
+    - file_name: "sensor5_temp.png"
+      point_min: 10
+      point_max: 150
+      line_color: "#0000FF"
+      back_color: "#ffffff"
+      line_width: 3
+      x_label: "时间"
+      y_label: "温度"
+      title: "sensor5_温度趋势"
+
+    - file_name: "sensor6_r_rms.png"
+      point_min: 10
+      point_max: 150
+      line_color: "#0000FF"
+      back_color: "#ffffff"
+      line_width: 3
+      x_label: "时间"
+      y_label: "加速度"
+      title: "sensor6_径向振动均方根趋势" #还有很多画图的配置，你参考原来老艾的设计和配置文件
+    - file_name: "sensor6_z_rms.png"
+      point_min: 10
+      point_max: 150
+      line_color: "#0000FF"
+      back_color: "#ffffff"
+      line_width: 3
+      x_label: "时间"
+      y_label: "加速度"
+      title: "sensor6_轴向振动均方根趋势"
+    - file_name: "sensor6_temp.png"
+      point_min: 10
+      point_max: 150
+      line_color: "#0000FF"
+      back_color: "#ffffff"
+      line_width: 3
+      x_label: "时间"
+      y_label: "温度"
+      title: "sensor6_温度趋势"

@@ -1,7 +1,7 @@
 import requests
 import json
 import numpy as np
-
+from general_functions.database_data import DatabaseFinder
 
 # from general_functions.functions import single_hysteresis_alarm
 # from general_functions import functions
@@ -31,31 +31,67 @@ db_config = {
 # 输入
 input_query = "bm1_rms>sensors.sensor1.r_rms"
 
+client = MongoClient(db_config["connection"])
+db = client[db_config["db_name"]]
+collection = db[collection_name]
 
-def get_mongodb_data(db_config, input_query, limit=10):
-    # 解析输入
-    collection_name, field_path = input_query.split('>')
+# 构建查询条件
+# query = {"is_running": True}
+#
+# # 构建投影
+# projection = {"shot": 1, "_id": 0}  # 需要包含_id以便排序
+# # 执行查询，并按"shot"字段排序
+# results = list(collection.find(query, projection))  # 1 表示升序，-1 表示降序
+# # client.close()
+# print(len(results))
+# # 构建投影
+# query = {"is_running": False}
+# # projection = {"shot": 1, "_id": 0}  # 需要包含_id以便排序
+# # 执行查询，并按"shot"字段排序
+# results = list(collection.find(query, projection))  # 1 表示升序，-1 表示降序
+# # client.close()
+# print(len(results))
+query = {"is_running": True}
 
-    # 建立数据库连接
-    client = MongoClient(db_config["connection"])
-    db = client[db_config["db_name"]]
-    collection = db[collection_name]
+projection = {"shot": 1, "_id": 0}  # 需要包含_id以便排序
+# 执行查询，并按"shot"字段排序
+results = list(collection.find(query, projection))  # 1 表示升序，-1 表示降序
+# for result in results:
+#     print(result)
+# client.close()
+print(len(results))
 
-    # 构建查询条件
-    query = {"is_running": True}
-
-    # 构建投影
-    projection = {field_path: 1, "shot": 1, "_id": 0}  # 需要包含_id以便排序
-    # 执行查询，并按"shot"字段排序
-    results = list(collection.find(query, projection).sort("shot", -1).limit(limit))  # 1 表示升序，-1 表示降序
-    client.close()
-    return results
-
-
-# 调用函数并打印结果
-results = get_mongodb_data(db_config, input_query, limit=5)  # 指定返回5条记录
-for result in results:
-    print(result)
+query = {"shot": {"$gt": -1, "$lte": 1110400}}
+training_data = collection.find(query).sort("shot", -1).limit(5000)
+training_data = list(training_data)
+print(len(training_data))
+client.close()
+# database_finder = DatabaseFinder(input_query, 1108210, 2, db, "bm1_rms")
+# print(database_finder.data)
+# def get_mongodb_data(db_config, input_query, limit=10):
+#     # 解析输入
+#     collection_name, field_path = input_query.split('>')
+#
+#     # 建立数据库连接
+#     client = MongoClient(db_config["connection"])
+#     db = client[db_config["db_name"]]
+#     collection = db[collection_name]
+#
+#     # 构建查询条件
+#     query = {"is_running": True}
+#
+#     # 构建投影
+#     projection = {field_path: 1, "shot": 1, "_id": 0}  # 需要包含_id以便排序
+#     # 执行查询，并按"shot"字段排序
+#     results = list(collection.find(query, projection).sort("shot", -1).limit(limit))  # 1 表示升序，-1 表示降序
+#     client.close()
+#     return results
+#
+#
+# # 调用函数并打印结果
+# results = get_mongodb_data(db_config, input_query, limit=5)  # 指定返回5条记录
+# for result in results:
+#     print(result)
 # # 输入字符串
 # input_string = "sensors.sensor1.axis_2_rms"
 # fields_to_query = [input_string, "shot"]

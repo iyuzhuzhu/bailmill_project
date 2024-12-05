@@ -1,8 +1,10 @@
 from sklearn.cluster import KMeans
 import numpy as np
 from pymongo import MongoClient
-from general_functions import functions, plots
+from general_functions import functions, plots, database_data
 import os
+from alarmSystem.Data.db.collectionDB import CollectionDB
+import sys
 
 
 def calculate_rms(data):
@@ -34,11 +36,8 @@ class Rms:
         """
         if self.config['is_training']:
             self.train_rms_model()
-            self.config['is_training'] = False
-            try:
-                functions.save_yaml(self.config, self.config_path, self.ruamel_yaml)
-            except Exception as e:
-                pass
+        if self.config['is_running_update']:
+            self.update_rms_start()
 
     def create_training_data_summary(self):
         """
@@ -64,31 +63,14 @@ class Rms:
         not_running_shot_num, training_shot_num = 0, 0
         if used_training:
             shot_num = self.config['training_shots']
-        try:
-            # 创建 MongoDB 客户端
-            client = MongoClient(self.config['db']['mongodb_address'])
-            # 选择数据库
-            db = self.config['db']['db_name']
-            # 选择集合
-            collection = self.config['db']['collection']
-            while training_shot_num < shot_num:
-                # 报错时,跳过报错的那炮数据(如遇到采集到的有效炮数小于配置文件中的训练炮数，终止循环)
-                try:
-                    # 训练从前一炮的数据开始取
-                    training_shot = int(self.shot) - training_shot_num - 1 - not_running_shot_num
-                    single_summary_data = collection.find_one({"shot": training_shot})
-                    if single_summary_data['is_running']:
-                        training_data_summary = self.single_data_training_summary(single_summary_data['sensors'],
-                                                                                  training_data_summary)
-                        training_shot_num += 1
-                    else:
-                        not_running_shot_num += 1
-                except Exception as e:
-                    # print(e)
-                    training_shot_num += 1
-        except Exception as e:
-            return False
-        # print(training_data_summary['sensor1'])
+        client, db = database_data.connect_config_database(self.config)
+        collection = self.config['db']['collection']
+        training_data = CollectionDB(db, collection).find_latest_n_records(shot_num, max_shot=int(self.shot))
+        # print(training_data)
+        for single_summary_data in training_data:
+            training_data_summary = self.single_data_training_summary(single_summary_data['sensors'],
+                                                                      training_data_summary)
+        client.close()
         return training_data_summary
 
     def get_alarm_config(self):
@@ -106,62 +88,70 @@ class Rms:
         将得到的阈值，并写入yaml文件
         :return:
         """
-        try:
-            training_data_summary = self.get_training_data_summary()
-            # 确认正确返回数据
-            if training_data_summary:
-                threshold_config, ruamel_yaml, alarm_config_path = functions.get_alarm_config(
-                    self.config['threshold_config_path'], self.name)
-                threshold_config = self.update_rms_start(training_data_summary, threshold_config)  # 更新判断是否启动阈值
-                h, hh = threshold_config['h'], threshold_config['hh']
-                sensors_rms_threshold = {}
-                for sensor in training_data_summary.keys():
-                    try:
-                        sensor_threshold = {}
-                        for rms_axis, rms_list in training_data_summary[sensor].items():
-                            sensor_threshold = functions.alarm_config_axis(rms_axis, rms_list, h, hh,
-                                                                           sensor_threshold)
-                    except Exception as e:
-                        # print(e)
-                        sensor_threshold = threshold_config['sensors_threshold'][sensor]
-                    sensor_threshold = functions.order_alarm_dict(sensor_threshold, 8)
-                    sensors_rms_threshold[sensor] = sensor_threshold
-                threshold_config['sensors_threshold'] = sensors_rms_threshold
-                functions.save_yaml(threshold_config, alarm_config_path, ruamel_yaml)
-        except Exception as e:
-            pass
+        training_data_summary = self.get_training_data_summary()
+        # print(training_data_summary)
+        # 确认正确返回数据
+        if training_data_summary:
+            threshold_config, ruamel_yaml, alarm_config_path = functions.get_threshold_config(
+                self.config['threshold_config_path'], self.name)
+            h, hh = threshold_config['h'], threshold_config['hh']
+            sensors_rms_threshold = {}
+            for sensor in training_data_summary.keys():
+                sensor_threshold = {}
+                for rms_axis, rms_list in training_data_summary[sensor].items():
+                    sensor_threshold = functions.alarm_config_axis(rms_axis, rms_list, h, hh,
+                                                                   sensor_threshold)
+                    # sensor_threshold = threshold_config['sensors_threshold'][sensor]
+                sensor_threshold = functions.order_alarm_dict(sensor_threshold, 8)
+                sensors_rms_threshold[sensor] = sensor_threshold
+            threshold_config['sensors_threshold'] = sensors_rms_threshold
+            functions.save_yaml(threshold_config, alarm_config_path, ruamel_yaml)
         # # print(sensors_rms_threshold)
 
-    @staticmethod
-    def update_rms_start(training_data_summary, threshold_config):
+    def get_update_rms_data(self, shot_num, min_shot=-1, max_shot=sys.maxsize):
+        client, db, collection = database_data.connect_config_collection(self.config)
+        training_data_summary = self.create_training_data_summary()
+        query = {"shot": {"$gt": min_shot, "$lte": max_shot}}
+        training_data = collection.find(query).sort("shot", -1).limit(shot_num)
+        training_data = list(training_data)
+        # print(training_data)
+        for single_summary_data in training_data:
+            training_data_summary = self.single_data_training_summary(single_summary_data['sensors'],
+                                                                      training_data_summary)
+        client.close()
+        return training_data_summary
+
+    def update_rms_start(self):
         """
         修改config文件中的ball_mills中的min_rms_start
         :return:
         """
-        try:
-            min_rms_start = []
-            start_sensor = threshold_config['is_running_threshold']['start_sensor']
-            start_axis = threshold_config['is_running_threshold']['start_axis']
-            for start_sensor in start_sensor:
-                rms_start_list = training_data_summary[start_sensor][start_axis]
-                data = np.array(rms_start_list).reshape(-1, 1)
-                # 使用 K-means 聚类
-                kmeans = KMeans(n_clusters=2, n_init='auto', random_state=0).fit(data)
-                # 获取每个簇的中心
-                centers = kmeans.cluster_centers_
-                # 排序中心值
-                sorted_centers = sorted(centers.flatten())
-                # 计算两个中心之间的中点作为阈值
-                threshold = (sorted_centers[0] + sorted_centers[1]) / 2
-                # 输出结果
-                threshold = functions.convert_to_serializable(threshold, 8)
-                threshold = functions.convert_floats_to_strings(threshold)
-                min_rms_start.append(threshold)
-            # print(min_rms_start)
-            threshold_config['is_running']['min_rms_start'] = min_rms_start
-        except Exception as e:
-            pass
-        return threshold_config
+        threshold_config, ruamel_yaml, alarm_config_path = functions.get_threshold_config(
+            self.config['threshold_config_path'], self.name)
+        # print(self.shot, type(self.config['training_shots']))
+        training_data_summary = self.get_update_rms_data(self.config['training_shots'], max_shot=int(self.shot))
+        # print(training_data_summary)
+        min_rms_start = []
+        start_sensor = threshold_config['is_running_threshold']['start_sensor']
+        start_axis = threshold_config['is_running_threshold']['start_axis']
+        for start_sensor in start_sensor:
+            rms_start_list = training_data_summary[start_sensor][start_axis]
+            data = np.array(rms_start_list).reshape(-1, 1)
+            # 使用 K-means 聚类
+            kmeans = KMeans(n_clusters=2, n_init='auto', random_state=0).fit(data)
+            # 获取每个簇的中心
+            centers = kmeans.cluster_centers_
+            # 排序中心值
+            sorted_centers = sorted(centers.flatten())
+            # 计算两个中心之间的中点作为阈值
+            threshold = (sorted_centers[0] + sorted_centers[1]) / 2
+            # 输出结果
+            threshold = functions.convert_to_serializable(threshold, 8)
+            threshold = functions.convert_floats_to_strings(threshold)
+            min_rms_start.append(threshold)
+        # print(min_rms_start)
+        threshold_config['is_running_threshold']['min_rms_start'] = min_rms_start
+        functions.save_yaml(threshold_config, alarm_config_path, ruamel_yaml)
 
     @staticmethod
     def single_data_training_summary(single_summary_data_results, training_data_summary):
@@ -381,8 +371,6 @@ class Rms:
     def get_single_sensor_result(single_sensor_rms=None, err=False):
         """
         返回单个sensor计算rms的结果，如果sensor计算rms报错则返回各个结果为None的字典
-        :param alarm:
-        :param sensor: 传感器名称
         :param single_sensor_rms: 正常情况下，没有计算报错得到的sensor_rms数据
         :param err: 有没有发生计算故障 False为未发生故障
         :return: 单个sensor的result
@@ -403,18 +391,6 @@ class Rms:
         return sensor_result
 
 
-def ball_mill_rms():
-    # # 输入参数
-    config_path, name, shot = functions.get_input_params('rms')
-    # config_path = './config.yml'
-    # name = 'bm1'
-    # shot = '1108200'
-    config = functions.read_config(config_path)
-    # Rms(name, config_path, shot)
-    # 得到bail_mill中的bail_name
-    Rms(name, config_path, shot)
-
-
 def test_shots_calculate():
     # # 输入参数
     # config_path, name, shot = functions.get_input_params('rms')
@@ -423,7 +399,8 @@ def test_shots_calculate():
     config = functions.read_config(config_path)
     # 得到bail_mill中的bail_name
 
-    shots = np.arange(1108200, 1110400)
+    # shots = np.arange(1108200, 1110400)
+    shots = np.arange(1110300, 1110400)
     for shot in shots:
         shot = str(shot)
         Rms(name, config_path, shot)
@@ -431,7 +408,13 @@ def test_shots_calculate():
 
 def main():
     # test_shots_calculate()
-    ball_mill_rms()
+    # # 输入参数
+    config_path, name, shot = functions.get_input_params('rms')
+    # config_path = './config.yml'
+    # name = 'bm1'
+    # shot = '1110400'
+    config = functions.read_config(config_path)
+    Rms(name, config_path, shot)
 
 
 if __name__ == '__main__':

@@ -48,6 +48,42 @@ def get_prefix_address(path, split='$bm$'):
     return prefix_address
 
 
+def replace_string(string, replacement, key):
+    """
+    替换字符串中$key$对应的部分为replacement
+    :param string: 被替换的字符串
+    :param replacement: 替换的内容
+    :param key: 被替换的关键字 如$bm$ bm为被替换的关键字
+    :return:
+    """
+    replacement_key = f"${key}$"
+    string = string.replace(replacement_key, replacement)
+    return string
+
+
+def replace_ball_mill_name(string, ball_mill_name):
+    string = replace_string(string, ball_mill_name, 'bm')
+    return string
+
+
+def replace_sensor(string, sensor):
+    string = replace_string(string, sensor, 'sensor')
+    return string
+
+
+def replace_shot_100(string, shot):
+    """
+    替换炮号，分为shot_2和shot两部分，shot_2表示每一百炮存一个文档
+    :param string:
+    :param shot:
+    :return:
+    """
+    shot_2 = int(int(shot) / 100)
+    string = replace_string(string, str(shot_2), 'shot_2')
+    string = replace_string(string, str(shot), 'shot')
+    return string
+
+
 def replace_path(data_source, shot, bm, sensor):
     """
     :param data_source: config文件中的datasource,Inference等数据存放地
@@ -65,8 +101,9 @@ def replace_path(data_source, shot, bm, sensor):
     return data_source
 
 
-def replace_wildcard():
-    pass
+def split_string(string, separate_identifier):
+    string_list = string.split(separate_identifier)
+    return string_list
 
 
 def read_hdf5(data_path):

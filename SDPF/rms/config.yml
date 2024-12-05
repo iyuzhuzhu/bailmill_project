@@ -8,8 +8,8 @@ summary_path: E:/资源汇总/新球磨项目/Data/Inference/$bm$ # 公共文件
 summary_file: summary.json # write to this summary file, not hard coded file name any more
 min_shots: 200
 max_shots: 500
-is_training: false # 是否自动更新警报阈值
-is_running_update: false # 是否更新判断是否运行的阈值
+is_training: False # 是否自动更新警报阈值
+is_running_update: False # 是否更新判断是否运行的阈值
 training_shots: 5000
 
 db: # 数据库的连接信息
