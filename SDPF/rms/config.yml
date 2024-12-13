@@ -5,14 +5,14 @@ plot_config_path: E:/资源汇总/新球磨项目/configs/plot_configs/basic_plo
 plot_desc_path: E:/资源汇总/新球磨项目/configs/plot_configs/basic_plot_config/basic_plot_desc.yml
 plot_desc_file: plot_desc.yml # 复制的画图配置文件的名称
 summary_path: E:/资源汇总/新球磨项目/Data/Inference/$bm$ # 公共文件路径
-is_training: True # 是否自动更新警报阈值
+is_training: False # 是否自动更新警报阈值
 is_running_update: False # 是否更新判断是否运行的阈值
 training_shots: 5000
 
 db: # 数据库的连接信息
   connection: mongodb://localhost:27017/
   db_name: bm
-  collection: bm1_rms
+  collection: $bm$_rms
 
 channels:
 - channel1: r

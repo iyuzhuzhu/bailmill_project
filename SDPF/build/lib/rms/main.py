@@ -16,9 +16,11 @@ class Rms:
     def __init__(self, name, config_path, shot, model_name='rms'):
         self.date_time, self.start_axis, self.start_sensor, self.is_running, self.temp = None, None, None, None, None
         self.name, self.shot, self.model_name, self.config_path = name, shot, model_name, config_path
-        self.config, self.ruamel_yaml = functions.load_yaml(self.config_path)
+        self.config, _ = functions.load_yaml(self.config_path)
         self.data_source, self.output_path, self.sensors = (self.config['data_source'], self.config['Inference_path'],
                                                             self.config['sensors'])
+        self.config['db']['collection'] = functions.replace_ball_mill_name(self.config['db']['collection'], self.name)
+        # print(self.config['db']['collection'])
         self.rms()
 
     def rms(self):
