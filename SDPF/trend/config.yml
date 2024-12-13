@@ -4,8 +4,8 @@ db: # 数据库的连接信息
     collection: "$bm$_rms"
 
 output_base_path: "E:/资源汇总/新球磨项目/Data/Inference/$bm$/$shot_2$00/$shot$/trend_plot/" #这一个配置下的所有的trend都输出到这一个目录下
-gui_config_file: /config/gui_trend_rms.json #每次画完图，把这个复制到输出的文件夹下.output_base_path
-
+gui_config_file: "E:/资源汇总/新球磨项目/configs/plot_configs/rms_trend_config/rms_plot_desc.yml" #每次画完图，把这个复制到输出的文件夹下.output_base_path
+plot_desc_file: "plot_desc.yml" # 输出图片文件夹内描述文件的名称
 x_input: "$bm$_rms>time" # 绘制图像的横坐标
 inputs:
     - "$bm$_rms>sensors.sensor1.r_rms" # >前面是collection名字，后面是读出类的记录里面的路径，找到当前记录报警的级别

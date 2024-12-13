@@ -2,6 +2,8 @@ import requests
 import json
 import numpy as np
 from general_functions.database_data import DatabaseFinder
+import os
+
 
 # from general_functions.functions import single_hysteresis_alarm
 # from general_functions import functions
@@ -11,6 +13,13 @@ def cross_entropy(p, q):
     p, q = np.array(p), np.array(q)
     assert p.shape == q.shape, "The two distributions must have the same shape."
     return -np.sum(p * np.log(q + 1e-10))  # 添加一个小值避免log(0)
+
+
+def rename_file(target_file, new_file_name):
+    if os.path.exists(target_file):
+        os.rename(target_file, new_file_name)
+
+rename_file('./test/test3.txt', 'test/test4.txt')
 
 
 from pymongo import MongoClient
@@ -29,43 +38,44 @@ db_config = {
 }
 
 # 输入
-input_query = "bm1_rms>sensors.sensor1.r_rms"
-
+# input_query = "bm1_rms>sensors.sensor1.r_rms"
+#
 client = MongoClient(db_config["connection"])
 db = client[db_config["db_name"]]
 collection = db[collection_name]
-
+#
 # 构建查询条件
+query = {"is_running": None}
+
+# 构建投影
+projection = {"shot": 1, "_id": 0}  # 需要包含_id以便排序
+# 执行查询，并按"shot"字段排序
+results = collection.find(query, projection)  # 1 表示升序，-1 表示降序
+# client.close()
+for result in results:
+    print(result)
+# # # 构建投影
+# # query = {"is_running": False}
+# # # projection = {"shot": 1, "_id": 0}  # 需要包含_id以便排序
+# # # 执行查询，并按"shot"字段排序
+# # results = list(collection.find(query, projection))  # 1 表示升序，-1 表示降序
+# # # client.close()
+# # print(len(results))
 # query = {"is_running": True}
 #
-# # 构建投影
 # projection = {"shot": 1, "_id": 0}  # 需要包含_id以便排序
 # # 执行查询，并按"shot"字段排序
 # results = list(collection.find(query, projection))  # 1 表示升序，-1 表示降序
+# # for result in results:
+# #     print(result)
 # # client.close()
 # print(len(results))
-# # 构建投影
-# query = {"is_running": False}
-# # projection = {"shot": 1, "_id": 0}  # 需要包含_id以便排序
-# # 执行查询，并按"shot"字段排序
-# results = list(collection.find(query, projection))  # 1 表示升序，-1 表示降序
-# # client.close()
-# print(len(results))
-query = {"is_running": True}
-
-projection = {"shot": 1, "_id": 0}  # 需要包含_id以便排序
-# 执行查询，并按"shot"字段排序
-results = list(collection.find(query, projection))  # 1 表示升序，-1 表示降序
-# for result in results:
-#     print(result)
+#
+# query = {"shot": {"$gt": -1, "$lte": 1110400}}
+# training_data = collection.find(query).sort("shot", -1).limit(5000)
+# training_data = list(training_data)
+# print(len(training_data))
 # client.close()
-print(len(results))
-
-query = {"shot": {"$gt": -1, "$lte": 1110400}}
-training_data = collection.find(query).sort("shot", -1).limit(5000)
-training_data = list(training_data)
-print(len(training_data))
-client.close()
 # database_finder = DatabaseFinder(input_query, 1108210, 2, db, "bm1_rms")
 # print(database_finder.data)
 # def get_mongodb_data(db_config, input_query, limit=10):

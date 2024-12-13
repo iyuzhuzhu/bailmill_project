@@ -4,6 +4,8 @@ import matplotlib.dates as mdates
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
+from general_functions import functions
+import matplotlib.font_manager as fm
 
 
 def is_number(value):
@@ -56,8 +58,8 @@ def adjust_whole_picture(bwith):
 
 
 def plot(x, y, x_label, y_label, title, save_path, x_min='-', x_max="-", y_min="-", y_max="-",
-         font='SimHei', linewidth=1.5, bwith=3, linestyle='-', color='r', size=(12, 6), back_color='white',
-         unicode_minus=False, is_x_time=False, x_rotation=0):
+         font='SimHei', num_font='Times New Roman', linewidth=1.5, bwith=3, linestyle='-', color='r',
+         size=(12, 6), back_color='white', unicode_minus=False, is_x_time=False, x_rotation=0):
     """
     基础绘制图像
     :param back_color: 背景颜色
@@ -77,6 +79,7 @@ def plot(x, y, x_label, y_label, title, save_path, x_min='-', x_max="-", y_min="
     :param color: 颜色
     :return:
     """
+    # 检查并确保 size 是一个包含两个数值的元组
     plt.rcParams['font.family'] = font  # 替换为你选择的字体
     fig, ax = plt.subplots(figsize=size, facecolor=back_color)
     plt.rcParams['axes.unicode_minus'] = unicode_minus  # False正常显示负号
@@ -84,8 +87,8 @@ def plot(x, y, x_label, y_label, title, save_path, x_min='-', x_max="-", y_min="
     plt.plot(x, y, lw=linewidth, ls=linestyle, c=color)
     # 添加标题和标签
     plt.tick_params(width=bwith)
-    plt.xticks(fontproperties='Times New Roman', weight="bold", fontsize=25, rotation=x_rotation)
-    plt.yticks(fontproperties='Times New Roman', weight="bold", fontsize=25)
+    plt.xticks(fontproperties=num_font, weight="bold", fontsize=25, rotation=x_rotation)
+    plt.yticks(fontproperties=num_font, weight="bold", fontsize=25)
     plt.xlabel(x_label, weight="bold", fontsize=25)
     plt.ylabel(y_label, weight="bold", fontsize=25)
     plt.title(title, weight="bold", fontsize=30, pad=10)
@@ -99,11 +102,12 @@ def plot(x, y, x_label, y_label, title, save_path, x_min='-', x_max="-", y_min="
 
 
 def plot_trend(x, y, x_label, y_label, title, save_path, x_min='-', x_max="-", y_min="-", y_max="-",
-         font='SimHei', linewidth=1.5, bwith=3, linestyle='-', color='r', size=(12, 6), back_color='white',
-         unicode_minus=False, is_x_time=True, x_rotation=-5):
+               linewidth=1.5, bwith=3, linestyle='-', color='r', size=(12, 6),back_color='white',
+               unicode_minus=False, is_x_time=True, x_rotation=-5):
     x = process_time_data(x)
-    plot(x, y, x_label, y_label, title, save_path, x_min, x_max, y_min, y_max, font, linewidth, bwith, linestyle,
-         color, size, back_color, unicode_minus, is_x_time, x_rotation)
+    plot(x, y, x_label, y_label, title, save_path, x_min, x_max, y_min, y_max, linewidth=linewidth, bwith=bwith,
+         linestyle=linestyle, color=color, size=size, back_color=back_color, unicode_minus=unicode_minus,
+         is_x_time=is_x_time, x_rotation=x_rotation)
 
 
 def plot_config(x, y, plot_data, output_folder):
@@ -117,7 +121,7 @@ def plot_config(x, y, plot_data, output_folder):
     output_plot_path = os.path.join(output_folder, output)
     plot(x, y, x_label, y_label, title, output_plot_path, color=line_color)
     if enable_detail:
-        detail_plot = output.split('.')[0] + "_detail" + output.split('.')[1]
+        detail_plot = output.split('.')[0] + "_detail" + '.' + output.split('.')[1]
         detail_plot_path = os.path.join(output_folder, detail_plot)
         plot(x, y, x_label, y_label, title, detail_plot_path, x_min, x_max, y_min, y_max,
              color=line_color)
@@ -131,15 +135,25 @@ def copy_file(source_file, destination_dir):
     :return:
     """
     # 确保目标目录存在，如果不存在则创建
-    if not os.path.exists(destination_dir):
-        os.makedirs(destination_dir)
+    functions.create_folder(destination_dir)
     # 构建目标文件的完整路径
     destination_file = os.path.join(destination_dir, os.path.basename(source_file))
     # 复制文件
     try:
         shutil.copy2(source_file, destination_file)  # 使用 copy2() 保留元数据
     except Exception as e:
-        pass
+        print(e)
+
+
+def copy_and_rename_file(source_file, destination_dir, new_file_name):
+    """
+    复制原文件到指定文件夹并修改命名(命名需要带后缀)
+    """
+    copy_file(source_file, destination_dir)
+    source_file_name = os.path.basename(source_file)
+    target_file_path = os.path.join(destination_dir, source_file_name)
+    # print(target_file_path)
+    functions.rename_file(target_file_path, new_file_name)
 
 
 if __name__ == "__main__":

@@ -84,6 +84,18 @@ def replace_shot_100(string, shot):
     return string
 
 
+def replace_bm_shot_path(path, bm, shot):
+    """
+    :param path: 被替换的地址
+    :param bm: 球磨机名称 如bm1
+    :param shot: 炮号
+    :return:
+    """
+    path = replace_shot_100(path, shot)
+    path = replace_ball_mill_name(path, bm)
+    return path
+
+
 def replace_path(data_source, shot, bm, sensor):
     """
     :param data_source: config文件中的datasource,Inference等数据存放地
@@ -92,11 +104,8 @@ def replace_path(data_source, shot, bm, sensor):
     :param sensor: 传感器名称 如sensor1
     :return: 替换了所有$str$的datasource
     """
-    shot_2 = int(int(shot) / 100)
-    data_source = data_source.replace('$shot$', shot)
-    data_source = data_source.replace('$shot_2$', str(shot_2))
-    data_source = data_source.replace('$bm$', bm)
-    data_source = data_source.replace('$sensor$', sensor)
+    data_source = replace_bm_shot_path(data_source, bm, shot)
+    data_source = replace_sensor(data_source, sensor)
     # print(data_source)
     return data_source
 
@@ -104,6 +113,25 @@ def replace_path(data_source, shot, bm, sensor):
 def split_string(string, separate_identifier):
     string_list = string.split(separate_identifier)
     return string_list
+
+
+def get_folder_path(source_file):
+    # 获取文件所在的文件夹地址
+    folder_path = os.path.dirname(source_file)
+    return folder_path
+
+
+def rename_file(target_file_path, new_file_name):
+    """
+    将目标路径对应的文件名修改为new_file_name（包括文件后缀）
+    """
+    target_folder_path = os.path.dirname(target_file_path)
+    new_file_path = os.path.join(target_folder_path, new_file_name)
+    # print(new_file_path)
+    if os.path.exists(target_file_path) and not os.path.exists(new_file_path):
+        os.rename(target_file_path, new_file_path)
+        if os.path.exists(target_file_path) and os.path.exists(new_file_path):
+            os.remove(target_file_path)
 
 
 def read_hdf5(data_path):
@@ -168,6 +196,25 @@ def get_sensors_data(data_source, shot, name, sensors):
             sensors_data[sensor] = None
             continue
     return sample_data, sensors_data
+
+
+def verify_list_all_None(lst: list):
+    """
+    确定输入的列表元素是否全为None，True则全为None
+    :return:
+    """
+    all_none = all(x is None for x in lst)
+    return all_none
+
+
+def verify_dict_value_all_None(dct: dict):
+    """
+    确定输入的字典的values是否全是None
+    """
+    value_list = list(dct.values())
+    result = verify_list_all_None(value_list)
+    return result
+
 
 
 def channel_to_axis(channels_to_axis, channel):

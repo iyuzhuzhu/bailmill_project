@@ -83,6 +83,7 @@ class Trend:
         """
         client, db = self.connect_mongodb_database()
         save_folder_path = self.create_save_folder()
+        self.copy_rename_plot_desc(save_folder_path)
         for i, y_input in enumerate(self.config['inputs']):
             x_input = self.config['x_input']
             output = self.config['outputs'][i]
@@ -99,6 +100,9 @@ class Trend:
         save_folder_path = functions.replace_shot_100(save_folder_path, str(self.shot))
         functions.create_folder(save_folder_path)
         return save_folder_path
+
+    def copy_rename_plot_desc(self, save_path):
+        plots.copy_and_rename_file(self.config['gui_config_file'], save_path, self.config['plot_desc_file'])
 
 
 def main():

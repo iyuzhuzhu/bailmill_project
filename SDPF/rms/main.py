@@ -1,6 +1,5 @@
 from sklearn.cluster import KMeans
 import numpy as np
-from pymongo import MongoClient
 from general_functions import functions, plots, database_data
 import os
 from alarmSystem.Data.db.collectionDB import CollectionDB
@@ -26,8 +25,9 @@ class Rms:
         self.training_model()
         sample_data, sensors_data = functions.get_sensors_data(self.data_source, self.shot, self.name,
                                                                self.sensors)
-        self.single_shot_summary(sensors_data, sample_data)
-        self.plot_model(sensors_data, sample_data)
+        if not functions.verify_dict_value_all_None(sensors_data):
+            self.single_shot_summary(sensors_data, sample_data)
+            self.plot_model(sensors_data, sample_data)
         # print(self.shot)
 
     def training_model(self):
@@ -201,7 +201,7 @@ class Rms:
         output_path = functions.create_output_folder(self.config['Inference_path'], self.shot, self.name)
         output_folder = os.path.join(output_path, save_plot_folder)
         functions.create_folder(output_folder)
-        plots.copy_file(self.config['plot_desc_path'], output_folder)  # 复制plot_desc
+        plots.copy_and_rename_file(self.config['plot_desc_path'], output_folder, self.config['plot_desc_file'])  # 复制plot_desc
         for plot_data in plot_config_data['plots']:
             sensor = plot_data['name']
             channel = plot_data['plot_channel']
@@ -413,7 +413,6 @@ def main():
     # config_path = './config.yml'
     # name = 'bm1'
     # shot = '1110400'
-    config = functions.read_config(config_path)
     Rms(name, config_path, shot)
 
 

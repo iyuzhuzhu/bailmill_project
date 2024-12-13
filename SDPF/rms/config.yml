@@ -1,14 +1,11 @@
 data_source: E:/资源汇总/新球磨项目/Data/Daq/$bm$/$shot_2$00/$sensor$/$shot$.hdf5 # 数据地址
 Inference_path: E:/资源汇总/新球磨项目/Data/Inference/$bm$/$shot_2$00/$shot$ # 输出地址
-model_path: E:/资源汇总/新球磨项目/Data/Train/models/$bm$/$sensor$
 threshold_config_path: E:/资源汇总/新球磨项目/configs/threshold_configs/$bm$/rms_threshold_config.yml
-plot_config_path: E:/资源汇总/新球磨项目/configs/plot_configs/basic_plot_config.yaml
-plot_desc_path: E:/资源汇总/新球磨项目/configs/plot_configs/basic_plot_desc.yaml
+plot_config_path: E:/资源汇总/新球磨项目/configs/plot_configs/basic_plot_config/basic_plot_config.yml
+plot_desc_path: E:/资源汇总/新球磨项目/configs/plot_configs/basic_plot_config/basic_plot_desc.yml
+plot_desc_file: plot_desc.yml # 复制的画图配置文件的名称
 summary_path: E:/资源汇总/新球磨项目/Data/Inference/$bm$ # 公共文件路径
-summary_file: summary.json # write to this summary file, not hard coded file name any more
-min_shots: 200
-max_shots: 500
-is_training: False # 是否自动更新警报阈值
+is_training: True # 是否自动更新警报阈值
 is_running_update: False # 是否更新判断是否运行的阈值
 training_shots: 5000
 
