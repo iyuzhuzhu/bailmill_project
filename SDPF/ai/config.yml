@@ -1,7 +1,7 @@
 data_source: E:/资源汇总/新球磨项目/Data/Daq/$bm$/$shot_2$00/$sensor$/$shot$.hdf5 # 数据地址
 Inference_path: E:/资源汇总/新球磨项目/Data/Inference/$bm$/$shot_2$00/$shot$ # 输出地址
 threshold_config_path: E:/资源汇总/新球磨项目/configs/threshold_configs/$bm$/ai_threshold_config.yml
-model_path: ../Train/$bm$/$sensor$ # 输出地址
+model_path: E:/ROS/Bailmill_project/Bailmill2/sdpf/code/Train/$bm$/$sensor$ # 输出地址
 model_name: $channel$.pth
 #plot_config_path: E:/资源汇总/新球磨项目/configs/plot_configs/basic_plot_config/basic_plot_config.yml
 #plot_desc_path: E:/资源汇总/新球磨项目/configs/plot_configs/basic_plot_config/basic_plot_desc.yml

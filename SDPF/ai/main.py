@@ -56,26 +56,8 @@ class Ai(BasicModel):
                 model_path, folder_path = self.get_save_model_path(sensor, channel)
                 if self.config['is_training']:
                     create_train_model(train_data, val_data, model_path, folder_path)
-                predictions, losses = self.predict_single_axis_loss(test_data, sensor, channel)
-                print(len(predictions[0]), losses[0])
-                model = self.load_model(sensor, channel)
-                # train_pre1, train_losses1 = predict(model, train_data)
-                test_pre1, test_losses1 = predict(model, test_data)
-                plt.figure()
-                plt.rcParams['font.sans-serif'] = ['SimHei']  # 使用黑体显示中文
-                plt.rcParams['axes.unicode_minus'] = False  # 解决负号 '-' 显示为方块的问题
-                plt.plot(test_losses1, c='b')
-                # plt.plot(train_losses1[:len(test_losses1)], c='g')
-                plt.title("训练集与测试集损失对比")
-                plt.show()
-                test_1 = test_data.cpu().numpy()
-                plt.figure()
-                plt.plot(test_1[1][:400])
-                # plt.plot(test_pre[0][:200], c='r', linewidth=1, linestyle='--')
-                plt.plot(test_pre1[1][:400], c='r', linewidth=1.5)
-                plt.title("测试集第2炮重构效果")
-                plt.show()
-
+                # predictions, losses = self.predict_single_axis_loss(test_data, sensor, channel)
+                # print(len(predictions[0]), losses[0])
                 # print(test_losses)
 
     def load_model(self, sensor, channel):
@@ -90,6 +72,11 @@ class Ai(BasicModel):
         predictions, losses = predict(model, data, self.device)
         # print(predictions, losses)
         return predictions, losses
+
+    def predict_single_shot(self):
+        for sensor in self.sensors:
+            for channel in self.channels:
+                
 
 
 def main():
