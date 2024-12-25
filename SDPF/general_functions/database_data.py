@@ -1,7 +1,10 @@
 from alarmSystem.Data.db.collectionDB import CollectionDB
-from general_functions.functions import split_string
 from pymongo import MongoClient
-from general_functions import functions
+
+
+def split_string(string, separate_identifier):
+    string_list = string.split(separate_identifier)
+    return string_list
 
 
 def connect_mongodb(address):
@@ -38,10 +41,23 @@ def split_input_collection(input, separate_identifier='>'):
     :param separate_identifier: 划分input的collection的辨识符 如>
     :return: 集合名称，集合内要取出的数据对应的关键字
     """
-    input_collection = functions.split_string(input, separate_identifier)
+    input_collection = split_string(input, separate_identifier)
     collection = input_collection[0]
     input = input_collection[1]
     return collection, input
+
+
+def get_is_running_shot(db, collection_name, shot_num, max_shot: int, min_shot=-1):
+    """
+    返回对应collection中shot介于min_sot和max_shot中的shot_num数目的正在运行的shot列表
+    """
+    collection_db = CollectionDB(db, collection_name)
+    documentation_list = collection_db.find_latest_n_records(shot_num, max_shot=max_shot, min_shot=min_shot)
+    # print(documentation_list)
+    is_running_shot = []
+    for documentation in documentation_list:
+        is_running_shot.append(documentation['shot'])
+    return is_running_shot
 
 
 class DatabaseFinder(CollectionDB):

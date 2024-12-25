@@ -15,9 +15,9 @@ db: # 数据库的连接信息
   collection: $bm$_rms
 
 channels:
+- channel0: r
 - channel1: r
-- channel2: r
-- channel3: z
+- channel2: z
 
 sensors:
 - sensor1     # the prefix for this sensor, all fields of this sensor will have this prefix

@@ -7,6 +7,8 @@ import numpy as np
 from datetime import datetime
 from pymongo import MongoClient
 from ruamel.yaml import YAML
+from general_functions.database_data import get_is_running_shot
+from typing import Optional
 
 
 def get_input_params(description):
@@ -96,7 +98,7 @@ def replace_bm_shot_path(path, bm, shot):
     return path
 
 
-def replace_path(data_source, shot, bm, sensor):
+def replace_path(data_source, shot: str, bm, sensor):
     """
     :param data_source: config文件中的datasource,Inference等数据存放地
     :param shot: 炮号
@@ -108,11 +110,6 @@ def replace_path(data_source, shot, bm, sensor):
     data_source = replace_sensor(data_source, sensor)
     # print(data_source)
     return data_source
-
-
-def split_string(string, separate_identifier):
-    string_list = string.split(separate_identifier)
-    return string_list
 
 
 def get_folder_path(source_file):
@@ -182,7 +179,7 @@ def get_sample_time(sample_data):
         return None
 
 
-def get_sensors_data(data_source, shot, name, sensors):
+def get_sensors_data(data_source, shot: str, name, sensors):
     """
     获取所有传感器的数据
     """
@@ -196,6 +193,61 @@ def get_sensors_data(data_source, shot, name, sensors):
             sensors_data[sensor] = None
             continue
     return sample_data, sensors_data
+
+
+def create_shots_raw_data_dict(sensors, channels):
+    """
+    创建存储多炮原始数据的字典格式
+    """
+    shots_data = {}
+    for sensor in sensors:
+        shots_data[sensor] = {}
+        for channel in channels:
+            shots_data[sensor][channel] = []
+    return shots_data
+
+
+def slice_data(data, drop_last, length: Optional[int] = None):
+    """
+    对数据进行切片
+    :param data: 输入数据
+    :param drop_last: 是否去除最后一个数据点
+    :param length: 将数据需要切成的长度
+    :return:
+    """
+    if drop_last:
+        data = data[:-1]
+    if length is not None:
+        data = data[:length]
+    return data
+
+
+def get_shots_raw_data(data_source, shots, name, sensors, channels, drop_last=True, length=None):
+    """
+    取出shots列表炮号的原始数据
+    :return:
+    """
+    shots_data = create_shots_raw_data_dict(sensors, channels)
+    for shot in shots:
+        shot = str(shot)
+        _, sensors_data = get_sensors_data(data_source, shot, name, sensors)
+        for sensor in sensors:
+            for channel in channels:
+                data = slice_data(sensors_data[sensor][channel], drop_last, length)
+                shots_data[sensor][channel].append(data)
+    return shots_data
+
+
+def get_is_running_shots_data(db, collection_name, shot_num, max_shot, data_source, name, sensors, channels,
+                              drop_last=True, min_shot=-1):
+    """
+    从数据库获取is_running为True的炮号。根据该炮号得到正在运行的炮的原始数据
+    """
+    # print(db, collection_name, shot_num, max_shot, min_shot)
+    is_running_shots = get_is_running_shot(db, collection_name, shot_num, max_shot, min_shot)
+    # print(is_running_shots)
+    is_running_shots_data = get_shots_raw_data(data_source, is_running_shots, name, sensors, channels, drop_last)
+    return is_running_shots_data
 
 
 def verify_list_all_None(lst: list):
@@ -214,7 +266,6 @@ def verify_dict_value_all_None(dct: dict):
     value_list = list(dct.values())
     result = verify_list_all_None(value_list)
     return result
-
 
 
 def channel_to_axis(channels_to_axis, channel):

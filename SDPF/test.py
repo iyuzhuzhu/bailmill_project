@@ -14,12 +14,18 @@ def cross_entropy(p, q):
     assert p.shape == q.shape, "The two distributions must have the same shape."
     return -np.sum(p * np.log(q + 1e-10))  # 添加一个小值避免log(0)
 
+# a = ['sensor1', 'sensor2']
+# b = ['channel0', 'channel2']
+# m = {sensor: {} for sensor in a}
+# n = {}
+# print(m)
 
-def rename_file(target_file, new_file_name):
-    if os.path.exists(target_file):
-        os.rename(target_file, new_file_name)
 
-rename_file('./test/test3.txt', 'test/test4.txt')
+# def rename_file(target_file, new_file_name):
+#     if os.path.exists(target_file):
+#         os.rename(target_file, new_file_name)
+#
+# rename_file('./test/test3.txt', 'test/test4.txt')
 
 
 from pymongo import MongoClient
@@ -44,16 +50,21 @@ client = MongoClient(db_config["connection"])
 db = client[db_config["db_name"]]
 collection = db[collection_name]
 #
-# 构建查询条件
-query = {"is_running": None}
-
-# 构建投影
-projection = {"shot": 1, "_id": 0}  # 需要包含_id以便排序
-# 执行查询，并按"shot"字段排序
-results = collection.find(query, projection)  # 1 表示升序，-1 表示降序
-# client.close()
-for result in results:
-    print(result)
+from alarmSystem.Data.db.collectionDB import CollectionDB
+# def get_is_running_shot(db, collection_name, shot_num, max_shot, min_shot=-1):
+#     """
+#     返回对应collection中shot介于min_sot和max_shot中的shot_num数目的正在运行的shot列表
+#     """
+#     collection_db = CollectionDB(db, collection_name)
+#     documentation_list = collection_db.find_latest_n_records(shot_num, max_shot=max_shot, min_shot=min_shot)
+#     # print(documentation_list)
+#     is_running_shot = []
+#     for documentation in documentation_list:
+#         is_running_shot.append(documentation['shot'])
+#     return is_running_shot
+# print(get_is_running_shot(db, collection_name,5000, 1110400))
+# # 构建查询条件
+# from alarmSystem.Data.db.collectionDB import CollectionDB
 # # # 构建投影
 # # query = {"is_running": False}
 # # # projection = {"shot": 1, "_id": 0}  # 需要包含_id以便排序
