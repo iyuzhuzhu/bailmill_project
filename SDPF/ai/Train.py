@@ -7,7 +7,6 @@ from sklearn.model_selection import train_test_split
 from matplotlib import pyplot as plt
 from ai.ae_model import LstmAutoencoder
 
-
 EPOCH = 150
 LR = 0.0004
 RANDOM_SEED = 42
@@ -16,8 +15,15 @@ TEST_SIZE = 0.1
 BATCH_SIZE = 50
 
 
+def is_tensor(obj):
+    return isinstance(obj, torch.Tensor)
+
+
 def transform_to_tensor(data):
-    return torch.Tensor(data)
+    if is_tensor(data):
+        return data
+    else:
+        return torch.Tensor(data)
 
 
 def split_train_val_test(data, test_size, val_test_size, random):

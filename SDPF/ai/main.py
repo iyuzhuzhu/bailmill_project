@@ -15,8 +15,15 @@ class Ai(BasicModel):
     def __init__(self, name, config_path, shot, model_name='ai'):
         super().__init__(name, config_path, shot, model_name)
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.train_models()
+        # self.train_models()
+        self.ai()
         # self.predict_single_axis_loss()
+
+    def ai(self):
+        if self.config['is_training']:
+            self.train_models()
+        sample_data, sensors_data = functions.get_sensors_data(self.data_source, self.shot, self.name, self.sensors)
+        self.predict_single_shot(sensors_data)
 
     def get_training_data(self):
         is_running_collection = functions.replace_ball_mill_name(self.config['db']['is_running_collection'], self.name)
@@ -67,16 +74,17 @@ class Ai(BasicModel):
         model_path, folder_path = self.get_save_model_path(sensor, channel)
         return torch.load(model_path)
 
-    def predict_single_axis_loss(self, data, sensor, channel):
+    def predict_single_axis_loss(self, data, sensor, channel, drop_last=True):
         model = self.load_model(sensor, channel)
         predictions, losses = predict(model, data, self.device)
         # print(predictions, losses)
         return predictions, losses
 
-    def predict_single_shot(self):
+    def predict_single_shot(self, sensors_data):
         for sensor in self.sensors:
             for channel in self.channels:
-                
+                predictions, losses = self.predict_single_axis_loss(sensors_data[sensor][channel], sensor, channel)
+                print(predictions[0])
 
 
 def main():
