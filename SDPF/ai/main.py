@@ -5,7 +5,7 @@ from general_functions.models import BasicModel
 import pandas as pd
 import torch
 from ai.Train import train_model, preprocessing_training_data, plot_history, create_train_model
-from ai.Inference import predict
+from ai.Inference import predict_single
 import numpy as np
 from pathlib import Path
 from matplotlib import pyplot as plt
@@ -61,8 +61,7 @@ class Ai(BasicModel):
             for channel in self.channels:
                 train_data, val_data, test_data = preprocessing_training_data(running_shots_data[sensor][channel])
                 model_path, folder_path = self.get_save_model_path(sensor, channel)
-                if self.config['is_training']:
-                    create_train_model(train_data, val_data, model_path, folder_path)
+                create_train_model(train_data, val_data, model_path, folder_path)
                 # predictions, losses = self.predict_single_axis_loss(test_data, sensor, channel)
                 # print(len(predictions[0]), losses[0])
                 # print(test_losses)
@@ -76,15 +75,19 @@ class Ai(BasicModel):
 
     def predict_single_axis_loss(self, data, sensor, channel, drop_last=True):
         model = self.load_model(sensor, channel)
-        predictions, losses = predict(model, data, self.device)
+        if drop_last:
+            data = data[:-1]
+        # print(data.shape)
+        prediction, loss = predict_single(model, data, self.device)
         # print(predictions, losses)
-        return predictions, losses
+        return prediction, loss
 
     def predict_single_shot(self, sensors_data):
         for sensor in self.sensors:
             for channel in self.channels:
-                predictions, losses = self.predict_single_axis_loss(sensors_data[sensor][channel], sensor, channel)
-                print(predictions[0])
+                prediction, loss = self.predict_single_axis_loss(sensors_data[sensor][channel], sensor, channel)
+                print(prediction)
+                print(loss)
 
 
 def main():

@@ -6,7 +6,8 @@ plot_desc_path: E:/资源汇总/新球磨项目/configs/plot_configs/basic_plot_
 plot_desc_file: plot_desc.yml # 复制的画图配置文件的名称
 summary_path: E:/资源汇总/新球磨项目/Data/Inference/$bm$ # 公共文件路径
 is_training: False # 是否自动更新警报阈值
-is_running_update: False # 是否更新判断是否运行的阈值
+is_running_update: True # 是否更新判断是否运行的阈值
+rms_image_path: E:/资源汇总/新球磨项目/Data/Inference/$bm$/rms_image # 历史RMS画图，辅助验证确定is_running阈值是否正确
 training_shots: 5000
 
 db: # 数据库的连接信息

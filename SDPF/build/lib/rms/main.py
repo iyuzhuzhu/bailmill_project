@@ -4,6 +4,7 @@ from general_functions import functions, plots, database_data
 import os
 from alarmSystem.Data.db.collectionDB import CollectionDB
 import sys
+from matplotlib import pyplot as plt
 
 
 def calculate_rms(data):
@@ -138,7 +139,9 @@ class Rms:
         start_axis = threshold_config['is_running_threshold']['start_axis']
         for start_sensor in start_sensor:
             rms_start_list = training_data_summary[start_sensor][start_axis]
-            data = np.array(rms_start_list).reshape(-1, 1)
+            data = np.array(rms_start_list)
+            self.plot_sort_rms(data, start_sensor)
+            data = data.reshape(-1, 1)
             # 使用 K-means 聚类
             kmeans = KMeans(n_clusters=2, n_init='auto', random_state=0).fit(data)
             # 获取每个簇的中心
@@ -154,6 +157,25 @@ class Rms:
         # print(min_rms_start)
         threshold_config['is_running_threshold']['min_rms_start'] = min_rms_start
         functions.save_yaml(threshold_config, alarm_config_path, ruamel_yaml)
+
+    def plot_sort_rms(self, rms_data, sensor):
+        """
+        绘制单个传感器的历史RMS的图片，辅助确定is_running的阈值是否正确
+        :param rms_data: 单个传感器的rms数据
+        :param sensor: 传感器名称
+        :return:
+        """
+        rms_data.sort()
+        # print(sensor, rms_data)
+        plt.plot(rms_data)
+        plt.title("{} RMS".format(sensor))
+        image_path = functions.replace_ball_mill_name(self.config['rms_image_path'], self.name)
+        image_path = functions.replace_sensor(image_path, sensor)
+        functions.create_folder(image_path)
+        image_name = sensor + "_rms.png"
+        image_path = os.path.join(image_path, image_name)
+        plt.savefig(image_path)
+        plt.close()
 
     @staticmethod
     def single_data_training_summary(single_summary_data_results, training_data_summary):
