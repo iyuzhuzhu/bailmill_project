@@ -6,6 +6,8 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from matplotlib import pyplot as plt
 from ai.ae_model import LstmAutoencoder
+from collections import Counter
+
 
 EPOCH = 150
 LR = 0.0004
@@ -23,7 +25,54 @@ def transform_to_tensor(data):
     if is_tensor(data):
         return data
     else:
+        target_length, _ = get_most_common_length(data, dim=1)
+        data = filter_by_length(data, target_length, dim=0)
         return torch.Tensor(data)
+
+
+def get_most_common_length(arrays_list, dim=1):
+    """
+    找出列表中NumPy一维数组出现次数最多的长度。
+
+    参数:
+        arrays_list (list of np.ndarray): 包含NumPy一维数组的列表。
+
+    返回:
+        tuple: 一个包含两个元素的元组，第一个元素是出现次数最多的长度，
+               第二个元素是这个长度出现的次数。
+    """
+    # 提取每个数组的长度
+    lengths = [arr.shape[0] for arr in arrays_list if arr.ndim == dim]
+    # 如果列表为空或没有符合条件的一维数组，则返回None
+    if not lengths:
+        return None, 0
+    # 使用Counter来计算每个长度出现的次数
+    length_counts = Counter(lengths)
+    # 找出出现次数最多的长度
+    most_common_length, count = length_counts.most_common(1)[0]
+    return most_common_length, count
+
+
+def filter_by_length(data, target_length, dim=0):
+    """
+    过滤数据，仅保留指定维度上长度等于目标值的样本。
+
+    Args:
+        data (list): 原始数据集，每个元素为一个样本（如numpy数组或PyTorch张量）。
+        target_length (int): 目标维度长度（默认为4096）。
+        dim (int): 需要检查长度的维度（默认为1，即第2个维度）。
+
+    Returns:
+        list: 过滤后的数据集。
+    """
+    filtered_data = []
+    for sample in data:
+        # 检查样本在目标维度的长度
+        if sample.shape[dim] == target_length:
+            filtered_data.append(sample)
+        else:
+            print(f"剔除样本：形状为{sample.shape}，目标维度{dim}长度应为{target_length}")
+    return filtered_data
 
 
 def split_train_val_test(data, test_size, val_test_size, random):

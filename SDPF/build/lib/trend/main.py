@@ -1,6 +1,6 @@
 import os.path
 from general_functions import functions, plots, database_data
-from general_functions.database_data import DatabaseFinder
+from general_functions.database_data import DatabaseFinder, split_string
 
 
 def split_input_collection(input, separate_identifier='>'):
@@ -10,16 +10,15 @@ def split_input_collection(input, separate_identifier='>'):
     :param separate_identifier: 划分input的collection的辨识符 如>
     :return: 集合名称，集合内要取出的数据对应的关键字
     """
-    input_collection = functions.split_string(input, separate_identifier)
+    input_collection = split_string(input, separate_identifier)
     collection = input_collection[0]
     input = input_collection[1]
     return collection, input
 
 
 class Trend:
-    def __init__(self, config_path, name, shot, include_collection=True,
-                 collection_separate_identifier='>', input_separate_identifier='.',
-                 collection=None):
+    def __init__(self, config_path, name, shot, include_collection=True, collection_separate_identifier='>',
+                 input_separate_identifier='.', collection=None):
         self.config = functions.read_config(config_path)
         self.name = name
         self.shot = int(shot)

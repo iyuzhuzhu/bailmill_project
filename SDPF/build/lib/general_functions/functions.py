@@ -233,8 +233,11 @@ def get_shots_raw_data(data_source, shots, name, sensors, channels, drop_last=Tr
         _, sensors_data = get_sensors_data(data_source, shot, name, sensors)
         for sensor in sensors:
             for channel in channels:
-                data = slice_data(sensors_data[sensor][channel], drop_last, length)
-                shots_data[sensor][channel].append(data)
+                if sensors_data[sensor] is None:
+                    print(shot, sensor, channel)
+                else:
+                    data = slice_data(sensors_data[sensor][channel], drop_last, length)
+                    shots_data[sensor][channel].append(data)
     return shots_data
 
 
@@ -248,7 +251,6 @@ def get_is_running_shots_data(db, collection_name, shot_num, max_shot, data_sour
     # print(is_running_shots)
     is_running_shots_data = get_shots_raw_data(data_source, is_running_shots, name, sensors, channels, drop_last)
     return is_running_shots_data
-
 
 def verify_list_all_None(lst: list):
     """
@@ -405,9 +407,11 @@ def save_yaml(data, file_path, ruamel_yaml):
         ruamel_yaml.dump(data, file)
 
 
-def alarm_config_axis(axis, data_list, h, hh, sensor_threshold):
+def alarm_config_axis(axis, data_list, h, hh, sensor_threshold, h_std_num: float=4, hh_std_num: float=5):
     """
     根据已有的数据列表与异常分位点，得到异常阈值列表
+    :param h_std_num:
+    :param hh_std_num:
     :param hh: 2级阈值分位点
     :param h: 1级阈值分位点
     :param axis: 轴向数据
@@ -415,8 +419,12 @@ def alarm_config_axis(axis, data_list, h, hh, sensor_threshold):
     :param sensor_threshold:异常阈值字典
     :return:
     """
-    h_threshold = np.percentile(data_list, 100 * h)
-    hh_threshold = np.percentile(data_list, 100 * hh)
+    # h_threshold = np.percentile(data_list, 100 * h)
+    # hh_threshold = np.percentile(data_list, 100 * hh)
+    mean = np.mean(data_list)
+    std = np.std(data_list, ddof=1)
+    h_threshold = mean + h_std_num * std
+    hh_threshold = mean + hh_std_num * std
     sensor_threshold['of_h_' + axis.split("_")[0]] = h_threshold
     sensor_threshold['of_hh_' + axis.split("_")[0]] = hh_threshold
     return sensor_threshold

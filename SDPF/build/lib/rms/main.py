@@ -28,9 +28,10 @@ class Rms:
         self.training_model()
         sample_data, sensors_data = functions.get_sensors_data(self.data_source, self.shot, self.name,
                                                                self.sensors)
+        # print(sensors_data)
         if not functions.verify_dict_value_all_None(sensors_data):
             self.single_shot_summary(sensors_data, sample_data)
-            self.plot_model(sensors_data, sample_data)
+            # self.plot_model(sensors_data, sample_data)
         # print(self.shot)
 
     def training_model(self):
@@ -167,7 +168,7 @@ class Rms:
         """
         rms_data.sort()
         # print(sensor, rms_data)
-        plt.plot(rms_data)
+        plt.plot(rms_data[:-int(len(rms_data)/10)])
         plt.title("{} RMS".format(sensor))
         image_path = functions.replace_ball_mill_name(self.config['rms_image_path'], self.name)
         image_path = functions.replace_sensor(image_path, sensor)
@@ -250,10 +251,10 @@ class Rms:
             rms = calculate_rms(value[:-1])  # 计算rms
             temp += value[-1]
             single_sensor_rms[axis] = rms
-            if self.config['channels'][channel_num - 1]['channel' + str(channel_num)] == 'r':
+            if self.config['channels'][channel_num-1]['channel' + str(channel_num)] == 'r':
                 r_rms += rms
                 r_rms_num += 1
-            elif self.config['channels'][channel_num - 1]['channel' + str(channel_num)] == 'z':
+            elif self.config['channels'][channel_num-1]['channel' + str(channel_num)] == 'z':
                 z_rms = rms
                 z_rms_num += 1
             channel_num += 1
@@ -273,13 +274,21 @@ class Rms:
         for key, threshold in sensor_threshold.items():
             threshold = float(threshold)
             if key.split('_')[2] == 'temp':
-                if single_sensor_rms['temp'] >= threshold and key.count('h') > single_sensor_rms['temp_alarm']:
-                    single_sensor_rms['temp_alarm'] = key.count('h')
+                try:
+                    if single_sensor_rms['temp'] >= threshold and key.count('h') > single_sensor_rms['temp_alarm']:
+                        single_sensor_rms['temp_alarm'] = key.count('h')
+                except Exception as e:
+                    single_sensor_rms['temp_alarm'] = 0
+                    print(e)
             else:
                 sensor_index = key.split('_')[2] + "_" + self.model_name
                 alarm_index = key.split('_')[2] + "_" + self.model_name + "_alarm"
-                if single_sensor_rms[sensor_index] >= threshold and key.count('h') > single_sensor_rms[alarm_index]:
-                    single_sensor_rms[alarm_index] = key.count('h')
+                try:
+                    if single_sensor_rms[sensor_index] >= threshold and key.count('h') > single_sensor_rms[alarm_index]:
+                        single_sensor_rms[alarm_index] = key.count('h')
+                except Exception as e:
+                    single_sensor_rms[alarm_index] = 0
+                    print(e)
         return single_sensor_rms
 
     def get_alarm(self, sensor, single_sensor_rms):
@@ -368,6 +377,8 @@ class Rms:
             is_running_results = []
             for index, start_sensor in enumerate(start_sensor):
                 single_sensor_rms = sensors_rms[start_sensor]
+                if single_sensor_rms[start_axis] is None:
+                    continue
                 if single_sensor_rms[start_axis] >= float(min_rms_start[index]):
                     is_running_results.append(True)
                 else:
@@ -424,20 +435,22 @@ def test_shots_calculate():
     # 得到bail_mill中的bail_name
 
     # shots = np.arange(1108200, 1110400)
-    shots = np.arange(1110300, 1110400)
+    shots = np.arange(1012849, 1110500)
     for shot in shots:
         shot = str(shot)
         Rms(name, config_path, shot)
+        print(shot)
 
 
 def main():
     # test_shots_calculate()
     # # 输入参数
-    config_path, name, shot = functions.get_input_params('rms')
-    # config_path = './config.yml'
-    # name = 'bm1'
-    # shot = '1110400'
-    Rms(name, config_path, shot)
+    # config_path, name, shot = functions.get_input_params('rms')
+    config_path = './config.yml'
+    name = 'bm1'
+    shot = '1110400'
+    # Rms(name, config_path, shot)
+    test_shots_calculate()
 
 
 if __name__ == '__main__':

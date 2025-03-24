@@ -1,13 +1,13 @@
-data_source: E:/资源汇总/新球磨项目/Data/Daq/$bm$/$shot_2$00/$sensor$/$shot$.hdf5 # 数据地址
-Inference_path: E:/资源汇总/新球磨项目/Data/Inference/$bm$/$shot_2$00/$shot$ # 输出地址
-threshold_config_path: E:/资源汇总/新球磨项目/configs/threshold_configs/$bm$/rms_threshold_config.yml
-plot_config_path: E:/资源汇总/新球磨项目/configs/plot_configs/basic_plot_config/basic_plot_config.yml
-plot_desc_path: E:/资源汇总/新球磨项目/configs/plot_configs/basic_plot_config/basic_plot_desc.yml
+data_source: D:/资源汇总/新球磨项目/Data/Daq/$bm$/$shot_2$00/$sensor$/$shot$.hdf5 # 数据地址
+Inference_path: D:/资源汇总/新球磨项目/Data/Inference/$bm$/$shot_2$00/$shot$ # 输出地址
+threshold_config_path: D:/资源汇总/新球磨项目/configs/threshold_configs/$bm$/rms_threshold_config.yml
+plot_config_path: D:/资源汇总/新球磨项目/configs/plot_configs/basic_plot_config/basic_plot_config.yml
+plot_desc_path: D:/资源汇总/新球磨项目/configs/plot_configs/basic_plot_config/basic_plot_desc.yml
 plot_desc_file: plot_desc.yml # 复制的画图配置文件的名称
-summary_path: E:/资源汇总/新球磨项目/Data/Inference/$bm$ # 公共文件路径
+summary_path: D:/资源汇总/新球磨项目/Data/Inference/$bm$ # 公共文件路径
 is_training: False # 是否自动更新警报阈值
-is_running_update: True # 是否更新判断是否运行的阈值
-rms_image_path: E:/资源汇总/新球磨项目/Data/Inference/$bm$/rms_image # 历史RMS画图，辅助验证确定is_running阈值是否正确
+is_running_update: False # 是否更新判断是否运行的阈值
+rms_image_path: D:/资源汇总/新球磨项目/Data/Inference/$bm$/rms_image # 历史RMS画图，辅助验证确定is_running阈值是否正确
 training_shots: 5000
 
 db: # 数据库的连接信息
@@ -16,9 +16,9 @@ db: # 数据库的连接信息
   collection: $bm$_rms
 
 channels:
-- channel0: r
 - channel1: r
-- channel2: z
+- channel2: r
+- channel3: z
 
 sensors:
 - sensor1     # the prefix for this sensor, all fields of this sensor will have this prefix
