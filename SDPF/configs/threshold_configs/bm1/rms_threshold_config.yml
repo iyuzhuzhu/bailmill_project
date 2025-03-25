@@ -1,0 +1,55 @@
+h: 0.95 # 一级异常阈值初始分位点
+hh: 0.98 # 二级异常阈值初始分位点
+# 以下为阈值 1个h表示一级阈值，2个h为二级
+
+is_running_threshold: # 判断球磨机是否运行的阈值配置
+  start_sensor:
+  - sensor1
+  - sensor5   # 检测是否运行参考的传感器
+  start_axis: r_rms # 检测是否运行时参考的传感器的轴 如rms_x rms_mean
+  min_rms_start:
+  - '0.00883425'
+  - '0.00622148'
+sensors_threshold: # 判断单个炮数据是否超出阈值
+  sensor1:
+    of_h_r: '0.01963631'
+    of_hh_r: '0.02013168'
+    of_h_z: '0.00933888'
+    of_hh_z: '0.0095018'
+    of_h_temp: '40.6875'
+    of_hh_temp: '41.1725'
+  sensor2:
+    of_h_r: '0.01137486'
+    of_hh_r: '0.01202064'
+    of_h_z: '0.00645622'
+    of_hh_z: '0.00664306'
+    of_h_temp: '39.1875'
+    of_hh_temp: '39.375'
+  sensor3:
+    of_h_r: '0.0'
+    of_hh_r: '0.0'
+    of_h_z: '0.0'
+    of_hh_z: '0.0'
+    of_h_temp: '0.0'
+    of_hh_temp: '0.0'
+  sensor4:
+    of_h_r: '0.0'
+    of_hh_r: '0.0'
+    of_h_z: '0.0'
+    of_hh_z: '0.0'
+    of_h_temp: '0.0'
+    of_hh_temp: '0.0'
+  sensor5:
+    of_h_r: '0.0116545'
+    of_hh_r: '0.01250253'
+    of_h_z: '0.02849718'
+    of_hh_z: '0.02902619'
+    of_h_temp: '39.3375'
+    of_hh_temp: '39.5'
+  sensor6:
+    of_h_r: '0.0'
+    of_hh_r: '0.0'
+    of_h_z: '0.0'
+    of_hh_z: '0.0'
+    of_h_temp: '0.0'
+    of_hh_temp: '0.0'

@@ -1,0 +1,60 @@
+plots:
+  - fileName: "sensor1x_detail.png"
+    title: "电机轴承1x轴方向震动波形_局部图"
+    size: m
+  - fileName: "sensor1y_detail.png"
+    title: "电机轴承1y轴方向震动波形_局部图"
+    size: m
+  - fileName: "sensor1z_detail.png"
+    title: "电机轴承1z轴方向震动波形_局部图"
+    size: m
+
+  - fileName: "sensor2x_detail.png"
+    title: "电机轴承2x轴方向震动波形_局部图"
+    size: m
+  - fileName: "sensor2y_detail.png"
+    title: "电机轴承2y轴方向震动波形_局部图"
+    size: m
+  - fileName: "sensor2z_detail.png"
+    title: "电机轴承2z轴方向震动波形_局部图"
+    size: m
+
+  - fileName: "sensor3x_detail.png"
+    title: "齿轮轴承1x轴方向震动波形_局部图"
+    size: m
+  - fileName: "sensor3y_detail.png"
+    title: "齿轮轴承1y轴方向震动波形_局部图"
+    size: m
+  - fileName: "sensor3z_detail.png"
+    title: "齿轮轴承1z轴方向震动波形_局部图"
+    size: m
+
+  - fileName: "sensor4x_detail.png"
+    title: "齿轮轴承2x轴方向震动波形_局部图"
+    size: m
+  - fileName: "sensor4y_detail.png"
+    title: "齿轮轴承2y轴方向震动波形_局部图"
+    size: m
+  - fileName: "sensor4z_detail.png"
+    title: "齿轮轴承2z轴方向震动波形_局部图"
+    size: m
+
+  - fileName: "sensor5x_detail.png"
+    title: "出料口轴承x轴方向震动波形_局部图"
+    size: m
+  - fileName: "sensor5y_detail.png"
+    title: "出料口轴承y轴方向震动波形_局部图"
+    size: m
+  - fileName: "sensor5z_detail.png"
+    title: "出料口轴承z轴方向震动波形_局部图"
+    size: m
+
+  - fileName: "sensor6x_detail.png"
+    title: "进料口轴承x轴方向震动波形_局部图"
+    size: m
+  - fileName: "sensor6y_detail.png"
+    title: "进料口轴承y轴方向震动波形_局部图"
+    size: m
+  - fileName: "sensor6z_detail.png"
+    title: "进料口轴承z轴方向震动波形_局部图"
+    size: m

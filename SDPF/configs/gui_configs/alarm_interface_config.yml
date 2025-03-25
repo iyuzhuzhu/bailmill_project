@@ -1,0 +1,36 @@
+db: # 数据库的连接信息
+    connection: "localhost:27017" # 本地
+    db_name: "bm"
+# 警报界面配置
+alarm_collection: "bm1_rms_alarm"
+translate:
+    levels: 
+        - level: 1
+          text: "初级"
+        - level: 2
+          text: "严重"
+    replace: 
+        - segment: "sensor1"
+          text: "电机轴承_1"
+        - segment: "sensor2"
+          text: "电机轴承_2"
+        - segment: "sensor3"
+          text: "齿轮轴承_1"
+        - segment: "sensor4"
+          text: "齿轮轴承_2"
+        - segment: "sensor5"
+          text: "出料口轴承"
+        - segment: "sensor6"
+          text: "进料口轴承"
+        - segment: "_r"
+          text: "径向振动"
+        - segment: "_z"
+          text: "轴向振动"
+        - segment: "on"
+          text: "出现"
+        - segment: "off"
+          text: "消失"
+        - segment: "handle"
+          text: "已处理"
+        - segment: "_temp"
+          text: "温度"

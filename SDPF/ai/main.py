@@ -21,11 +21,14 @@ class Ai(BasicModel):
     def ai(self):
         if self.config['is_training']:
             self.train_models()
-        # print(1)
-        sample_data, sensors_data = functions.get_sensors_data(self.data_source, self.shot, self.name, self.sensors)
-        rec_data = self.predict_single_shot(sensors_data)
-        # print(rec_data)
-        self.plot_model(sensors_data, rec_data, sample_data)
+        rms_record = functions.get_rms_record(self.config['db']['is_running_collection'], self.name, int(self.shot),
+                                              self.db)
+        if rms_record['is_running']:
+            sample_data, sensors_data = functions.get_sensors_data(self.data_source, self.shot, self.name, self.sensors)
+            rec_data = self.predict_single_shot(sensors_data)
+            # print(rec_data)
+            self.plot_model(sensors_data, rec_data, sample_data)
+            self.single_shot_summary(sensors_data, rms_record)
 
     def get_training_data(self):
         is_running_collection = functions.replace_ball_mill_name(self.config['db']['is_running_collection'], self.name)
@@ -208,49 +211,40 @@ class Ai(BasicModel):
         for sensor in self.sensors:
             try:
                 # sensor_data = rec_data[sensor]
-                single_sensor_rms = self.calculate_single_sensor_ai(rec_data[sensor])
-                sensors_ai[sensor] = single_sensor_rms
+                sensors_ai[sensor] = self.calculate_single_sensor_ai(rec_data[sensor])
             except Exception as e:
                 # print(e)
                 sensors_ai[sensor] = self.get_single_sensor_result(err=True)
         return sensors_ai
 
-    def get_rms_record(self, ):
-        is_running_collection = functions.replace_string(self.config['is_running_collection'], self.name, 'bm')
-        query = {'shot': int(self.shot)}
-        rms_record = CollectionDB(self.db, is_running_collection).find_record(query)
-        # is_running = [record for record in rms_records if 'is_running' in record][0]
-        return rms_record
-
-    def single_shot_sensors_summary(self, rec_data, is_running):
+    def single_shot_sensors_summary(self, rec_data, is_running: bool):
         """
         将模型单独炮的数据分析结果汇总
         :return:
         """
         sensors = {}
-        sensors_rms = self.calculate_single_sensors_ai(rec_data)
-        for sensor, single_sensor_rms in sensors_rms.items():
+        sensors_ai = self.calculate_single_sensors_ai(rec_data)
+        for sensor, single_sensor in sensors_ai.items():
             # 防止出现传感器出现故障，导致数据没有被采集的故障报错导致程序中断运行
             try:
                 if is_running:
-                    single_sensor_rms = self.get_alarm(sensor, single_sensor_rms)
-                sensors[sensor] = single_sensor_rms
+                    sensors[sensor] = self.get_alarm(sensor, single_sensor)
             except Exception as e:
                 # print(e)
                 sensors[sensor] = self.get_single_sensor_result(err=True)
         return sensors
 
-    def single_shot_summary(self, sensors_data, sample_data):
+    def single_shot_summary(self, sensors_data, rms_record):
         """
         汇总当前summary信息
         :return:
         """
-        rms_record = self.get_rms_record()
-        is_running = [record for record in rms_record if 'is_running' in record][0]
-        sensors = self.single_shot_sensors_summary(sensors_data, is_running)
-        self.date_time = functions.get_sample_time(sample_data)
-        single_shot_summary = functions.single_shot_summary(self.name, self.shot, sensors, self.date_time
-                                                            , is_running)
+        single_shot_summary = rms_record
+        sensors = self.single_shot_sensors_summary(sensors_data, rms_record['is_running'])
+        single_shot_summary['sensors'] = sensors
+        # self.date_time = functions.get_sample_time(sample_data)
+        # single_shot_summary = functions.single_shot_summary(self.name, self.shot, sensors, self.date_time
+        #                                                     , is_running)
         address = self.config['db']['connection']
         collection_name = self.config['db']['collection']
         functions.save_single_summary_mongodb(single_shot_summary, address, collection_name, self.shot,

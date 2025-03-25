@@ -8,6 +8,7 @@ from datetime import datetime
 from pymongo import MongoClient
 from ruamel.yaml import YAML
 from general_functions.database_data import get_is_running_shot
+from alarmSystem.Data.db.collectionDB import CollectionDB
 from typing import Optional
 
 
@@ -234,7 +235,8 @@ def get_shots_raw_data(data_source, shots, name, sensors, channels, drop_last=Tr
         for sensor in sensors:
             for channel in channels:
                 if sensors_data[sensor] is None:
-                    print(shot, sensor, channel)
+                    # print(shot, sensor, channel)
+                    continue
                 else:
                     data = slice_data(sensors_data[sensor][channel], drop_last, length)
                     shots_data[sensor][channel].append(data)
@@ -546,6 +548,13 @@ def save_single_summary_mongodb(single_summary, address, collection_name, shot, 
 def create_and_save_single_summary(bm, shot, sensors, address, collection_name, database_name, is_running=None):
     single_summary = single_shot_summary(bm, shot, sensors, is_running)
     save_single_summary_mongodb(single_summary, address, collection_name, database_name)
+
+
+def get_rms_record(is_running_collection: str, name: str, shot: int, db, replace_key='bm'):
+    is_running_collection = replace_string(is_running_collection, name, replace_key)
+    query = {'shot': int(shot)}
+    rms_record = CollectionDB(db, is_running_collection).find_record(query)
+    return rms_record[0]
 
 
 def save_alarm_config(file_path, alarm_config_data):

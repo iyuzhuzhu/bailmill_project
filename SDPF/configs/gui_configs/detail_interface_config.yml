@@ -1,0 +1,59 @@
+db: # 数据库的连接信息
+    connection: "localhost:27017" # 本地
+    db_name: "bm"
+
+# 详情数据界面配置
+plot_panels: #可以有很多个显示图片的panel就和以前一样，可以折叠的哪个
+    - title: "振动与温度趋势图"
+      plots_path: "/home/jtext103/share/testresult/Inference/bm1/$shot_2$00/$shot_0$/trend_plot/"
+    - title: "振动波形图"
+      plots_path: "/home/jtext103/share/testresult/Inference/bm1/$shot_2$00/$shot_0$/basic_plot/"
+fields: # 显示最新的？运行？数据
+    - label: "数据编号:"
+      value: "bm1_rms>shot"
+    - label: "数据更新时间:"
+      value: "bm1_rms>time"
+    - label: "是否运行:"
+      value: "bm1_rms>is_running"
+
+    - label: "电机轴承_1_轴向振动(g):"
+      value: "bm1_rms>sensors.sensor1.r_rms"
+    - label: "电机轴承_1_径向振动(g):"
+      value: "bm1_rms>sensors.sensor1.z_rms"
+    - label: "电机轴承_1_温度(°C):"
+      value: "bm1_rms>sensors.sensor1.temp"
+
+    - label: "电机轴承_2_轴向振动(g):"
+      value: "bm1_rms>sensors.sensor2.r_rms"
+    - label: "电机轴承_2_径向振动(g):"
+      value: "bm1_rms>sensors.sensor2.z_rms"
+    - label: "电机轴承_2_温度(°C):"
+      value: "bm1_rms>sensors.sensor2.temp"
+
+    - label: "齿轮轴承_1_轴向振动(g):"
+      value: "bm1_rms>sensors.sensor3.r_rms"
+    - label: "齿轮轴承_1_径向振动(g):"
+      value: "bm1_rms>sensors.sensor3.z_rms"
+    - label: "齿轮轴承_1_温度(°C):"
+      value: "bm1_rms>sensors.sensor3.temp"
+
+    - label: "齿轮轴承_2_轴向振动(g):"
+      value: "bm1_rms>sensors.sensor4.r_rms"
+    - label: "齿轮轴承_2_径向振动(g):"
+      value: "bm1_rms>sensors.sensor4.z_rms"
+    - label: "齿轮轴承_2_温度(°C):"
+      value: "bm1_rms>sensors.sensor4.temp"
+
+    - label: "出料口轴承_轴向振动(g):"
+      value: "bm1_rms>sensors.sensor5.r_rms"
+    - label: "出料口轴承_径向振动(g):"
+      value: "bm1_rms>sensors.sensor5.z_rms"
+    - label: "出料口轴承_温度(°C):"
+      value: "bm1_rms>sensors.sensor5.temp"
+
+    - label: "进料口轴承_轴向振动(g):"
+      value: "bm1_rms>sensors.sensor6.r_rms"
+    - label: "进料口轴承_径向振动(g):"
+      value: "bm1_rms>sensors.sensor6.z_rms"
+    - label: "进料口轴承_温度(°C):"
+      value: "bm1_rms>sensors.sensor6.temp"

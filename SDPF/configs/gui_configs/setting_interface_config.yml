@@ -1,0 +1,85 @@
+db: # 数据库的连接信息
+    connection: "localhost:27017" # 本地
+    db_name: "bm"
+# 设置界面
+password: "123456" #用这个密码才能打开设置页面
+super_password: "qweqweqwe" #这个就是后门不能改的密码，用这个也能进来，用户不能改，只能通过配置文件该，启示就是方便调试用的
+config_file: "/home/jtext103/configs/threshold_configs/bm1/rms_threshold_config.yml"
+fields: 
+    - label: "电机轴承_1_径向1级阈值" 
+      value: "sensors_threshold.sensor1.of_h_r" # 修改config文件中config['sensors_threshold']['sensor1']['of_h_r']的对应值
+    - label: "电机轴承_1_径向2级阈值"
+      value: "sensors_threshold.sensor1.of_hh_r"
+    - label: "电机轴承_1_轴向1级阈值"
+      value: "sensors_threshold.sensor1.of_h_z"
+    - label: "电机轴承_1_轴向2级阈值"
+      value: "sensors_threshold.sensor1.of_hh_z"
+    - label: "电机轴承_1_温度1级阈值"
+      value: "sensors_threshold.sensor1.of_h_temp"
+    - label: "电机轴承_1_温度2级阈值"
+      value: "sensors_threshold.sensor1.of_hh_temp"
+
+    - label: "电机轴承_2_径向1级阈值" 
+      value: "sensors_threshold.sensor2.of_h_r" # 修改config文件中config['sensors_threshold']['sensor1']['of_h_r']的对应值
+    - label: "电机轴承_2_径向2级阈值"
+      value: "sensors_threshold.sensor2.of_hh_r"
+    - label: "电机轴承_2_轴向1级阈值"
+      value: "sensors_threshold.sensor2.of_h_z"
+    - label: "电机轴承_2_轴向2级阈值"
+      value: "sensors_threshold.sensor2.of_hh_z"
+    - label: "电机轴承_2_温度1级阈值"
+      value: "sensors_threshold.sensor2.of_h_temp"
+    - label: "电机轴承_2_温度2级阈值"
+      value: "sensors_threshold.sensor2.of_hh_temp"
+    
+    - label: "齿轮轴承_1_径向1级阈值" 
+      value: "sensors_threshold.sensor3.of_h_r" # 修改config文件中config['sensors_threshold']['sensor1']['of_h_r']的对应值
+    - label: "齿轮轴承_1_径向2级阈值"
+      value: "sensors_threshold.sensor3.of_hh_r"
+    - label: "齿轮轴承_1_轴向1级阈值"
+      value: "sensors_threshold.sensor3.of_h_z"
+    - label: "齿轮轴承_1_轴向2级阈值"
+      value: "sensors_threshold.sensor3.of_hh_z"
+    - label: "齿轮轴承_1_温度1级阈值"
+      value: "sensors_threshold.sensor3.of_h_temp"
+    - label: "齿轮轴承_1_温度2级阈值"
+      value: "sensors_threshold.sensor3.of_hh_temp"
+
+    - label: "齿轮轴承_2_径向1级阈值" 
+      value: "sensors_threshold.sensor4.of_h_r" # 修改config文件中config['sensors_threshold']['sensor1']['of_h_r']的对应值
+    - label: "齿轮轴承_2_径向2级阈值"
+      value: "sensors_threshold.sensor4.of_hh_r"
+    - label: "齿轮轴承_2_轴向1级阈值"
+      value: "sensors_threshold.sensor4.of_h_z"
+    - label: "齿轮轴承_2_轴向2级阈值"
+      value: "sensors_threshold.sensor4.of_hh_z"
+    - label: "齿轮轴承_2_温度1级阈值"
+      value: "sensors_threshold.sensor4.of_h_temp"
+    - label: "齿轮轴承_2_温度2级阈值"
+      value: "sensors_threshold.sensor4.of_hh_temp"
+
+    - label: "出料口轴承_径向1级阈值" 
+      value: "sensors_threshold.sensor5.of_h_r" # 修改config文件中config['sensors_threshold']['sensor1']['of_h_r']的对应值
+    - label: "出料口轴承_径向2级阈值"
+      value: "sensors_threshold.sensor5.of_hh_r"
+    - label: "出料口轴承_轴向1级阈值"
+      value: "sensors_threshold.sensor5.of_h_z"
+    - label: "出料口轴承_轴向2级阈值"
+      value: "sensors_threshold.sensor5.of_hh_z"
+    - label: "出料口轴承_温度1级阈值"
+      value: "sensors_threshold.sensor5.of_h_temp"
+    - label: "出料口轴承_温度2级阈值"
+      value: "sensors_threshold.sensor5.of_hh_temp"
+
+    - label: "进料口轴承_径向1级阈值" 
+      value: "sensors_threshold.sensor6.of_h_r" # 修改config文件中config['sensors_threshold']['sensor1']['of_h_r']的对应值
+    - label: "进料口轴承_径向2级阈值"
+      value: "sensors_threshold.sensor6.of_hh_r"
+    - label: "进料口轴承_轴向1级阈值"
+      value: "sensors_threshold.sensor6.of_h_z"
+    - label: "进料口轴承_轴向2级阈值"
+      value: "sensors_threshold.sensor6.of_hh_z"
+    - label: "进料口轴承_温度1级阈值"
+      value: "sensors_threshold.sensor6.of_h_temp"
+    - label: "进料口轴承_温度2级阈值"
+      value: "sensors_threshold.sensor6.of_hh_temp"

@@ -1,0 +1,208 @@
+title: "球磨机1号"
+db: # 数据库的连接信息
+    connection: "localhost:27017" # 本地
+    db_name: "bm"
+
+# 主界面配置
+is_running: "bm1_rms>is_running" # >前面是collection名字，后面是读出类的记录里面的路径，该条表示球磨机是否运行。
+last_updated_time: "bm1_rms>time" # 最新数据更新时间
+colors: #各种颜色的设定
+    alarm_level:
+        - level: 0
+          color: "#15ff00"
+        - level: 1
+          color: "#fff421" #对应警报级别，数值文字的颜色
+        - level: 2
+          color: "#ff000d"
+    alarm_light:
+        - level: 0 #0，表示没有未处理的警报，就是警灯灭掉的颜色
+          color: "#9e9e9e"
+          text_color: "#1f1f1f"
+        - level: 1
+          color: "#fff421" #对应警报级别，警灯的颜色，以及警报灯的颜色
+          text_color: "#1f1f1f" #文字的颜色
+        - level: 2  #二级警报灯的颜色
+          color: "#ff000d"
+          text_color: "#1f1f1f"
+    is_running:
+        - level: 0 # 0表示未在运行，1表示在运行
+          color: "#1f1f1f"
+          text: "未运行" # 运行显示文本
+        - level: 1
+          color: "#008000"
+          text: "运行中"
+panels: #6个面板
+    - panel_no: 0 #编号从0开始
+      title: "电机轴承_1"
+      label_1: "径向振动" # 一共3个label和value
+      value_1: "bm1_rms>sensors.sensor1.r_rms"
+      value_1_alarm: "bm1_rms>sensors.sensor1.r_rms_alarm" #警报级别，用来改变value的字体颜色
+      alarm_1: "bm1_rms_alarm>alarm_type@sensor1_r;level@1" #1号警灯，静等在一个panel里面也是先行后列的编号模式，这个第一行第一个，一行3个，显示逻辑见外面说明，这个配置字符串的意思是，collection>alarm_type=sensor1_r and level=1
+      alarm_1_level: 1 #1号警灯对应的颜色级别，注意这个是用来和color里面alarm_light的颜色对应的
+      alarm_4: "bm1_rms_alarm>alarm_type@sensor1_r;level@2" #2号警灯， 和第二行第一个，
+      alarm_4_level: 2
+      value_1_unit: "g" # 数据单位
+
+      label_2: "轴向振动" # 一共3个label和value
+      value_2: "bm1_rms>sensors.sensor1.z_rms"
+      value_2_alarm: "bm1_rms>sensors.sensor1.z_rms_alarm" #警报级别，用来改变value的字体颜色
+      alarm_2: "bm1_rms_alarm>alarm_type@sensor1_z;level@1"
+      alarm_2_level: 1 #1号警灯对应的颜色级别，注意这个是用来和color里面alarm_light的颜色对应的
+      alarm_5: "bm1_rms_alarm>alarm_type@sensor1_z;level@2"
+      alarm_5_level: 2
+      value_2_unit: "g"
+
+      label_3: "温度" # 一共3个label和value
+      value_3: "bm1_rms>sensors.sensor1.temp"
+      value_3_alarm: "bm1_rms>sensors.sensor1.r_rms_alarm" #警报级别，用来改变value的字体颜色
+      alarm_3: "bm1_rms_alarm>alarm_type@sensor1_temp;level@1"
+      alarm_3_level: 1
+      alarm_6: "bm1_rms_alarm>alarm_type@sensor1_temp;level@2"
+      alarm_6_level: 2
+      value_3_unit: "℃"
+
+    - panel_no: 1 #编号从0开始
+      title: "电机轴承_2"
+      label_1: "径向振动" # 一共3个label和value
+      value_1: "bm1_rms>sensors.sensor2.r_rms"
+      value_1_alarm: "bm1_rms>sensors.sensor2.r_rms_alarm" #警报级别，用来改变value的字体颜色
+      alarm_1: "bm1_rms_alarm>alarm_type@sensor2_r;level@1" #1号警灯，静等在一个panel里面也是先行后列的编号模式，这个第一行第一个，一行3个，显示逻辑见外面说明，这个配置字符串的意思是，collection>alarm_type=sensor1_r and level=1
+      alarm_1_level: 1 #1号警灯对应的颜色级别，注意这个是用来和color里面alarm_light的颜色对应的
+      alarm_4: "bm1_rms_alarm>alarm_type@sensor2_r;level@2" #2号警灯， 和第二行第一个，
+      alarm_4_level: 2
+      value_1_unit: "g"
+
+      label_2: "轴向振动" # 一共3个label和value
+      value_2: "bm1_rms>sensors.sensor2.z_rms"
+      value_2_alarm: "bm1_rms>sensors.sensor2.z_rms_alarm" #警报级别，用来改变value的字体颜色
+      alarm_2: "bm1_rms_alarm>alarm_type@sensor2_z;level@1"
+      alarm_2_level: 1
+      alarm_5: "bm1_rms_alarm>alarm_type@sensor2_z;level@2"
+      alarm_5_level: 2
+      value_2_unit: "g"
+
+      label_3: "温度" # 一共3个label和value
+      value_3: "bm1_rms>sensors.sensor2.temp"
+      value_3_alarm: "bm1_rms>sensors.sensor2.r_rms_alarm" #警报级别，用来改变value的字体颜色
+      alarm_3: "bm1_rms_alarm>alarm_type@sensor2_temp;level@1"
+      alarm_3_level: 1
+      alarm_6: "bm1_rms_alarm>alarm_type@sensor2_temp;level@2"
+      alarm_6_level: 1
+      value_3_unit: "℃"
+
+    - panel_no: 2 #编号从0开始
+      title: "齿轮轴承_1"
+      label_1: "径向振动" # 一共3个label和value
+      value_1: "bm1_rms>sensors.sensor3.r_rms"
+      value_1_alarm: "bm1_rms>sensors.sensor3.r_rms_alarm" #警报级别，用来改变value的字体颜色
+      alarm_1: "bm1_rms_alarm>alarm_type@sensor3_r;level@1" #1号警灯，静等在一个panel里面也是先行后列的编号模式，这个第一行第一个，一行3个，显示逻辑见外面说明，这个配置字符串的意思是，collection>alarm_type=sensor1_r and level=1
+      alarm_1_level: 1 #1号警灯对应的颜色级别，注意这个是用来和color里面alarm_light的颜色对应的
+      alarm_4: "bm1_rms_alarm>alarm_type@sensor3_r;level@2" #2号警灯， 和第二行第一个，
+      alarm_4_level: 2
+      value_1_unit: "g"
+
+      label_2: "轴向振动" # 一共3个label和value
+      value_2: "bm1_rms>sensors.sensor3.z_rms"
+      value_2_alarm: "bm1_rms>sensors.sensor3.z_rms_alarm" #警报级别，用来改变value的字体颜色
+      alarm_2: "bm1_rms_alarm>alarm_type@sensor3_z;level@1"
+      alarm_2_level: 1
+      alarm_5: "bm1_rms_alarm>alarm_type@sensor3_z;level@2"
+      alarm_5_level: 2
+      value_2_unit: "g"
+      
+      label_3: "温度" # 一共3个label和value
+      value_3: "bm1_rms>sensors.sensor3.temp"
+      value_3_alarm: "bm1_rms>sensors.sensor3.r_rms_alarm" #警报级别，用来改变value的字体颜色
+      alarm_3: "bm1_rms_alarm>alarm_type@sensor3_temp;level@1"
+      alarm_3_level: 1
+      alarm_6: "bm1_rms_alarm>alarm_type@sensor3_temp;level@2"
+      alarm_6_level: 2
+      value_3_unit: "℃"
+
+    
+    - panel_no: 3 #编号从0开始
+      title: "齿轮轴承_2"
+      label_1: "径向振动" # 一共3个label和value
+      value_1: "bm1_rms>sensors.sensor4.r_rms"
+      value_1_alarm: "bm1_rms>sensors.sensor4.r_rms_alarm" #警报级别，用来改变value的字体颜色
+      alarm_1: "bm1_rms_alarm>alarm_type@sensor4_r;level@1" #1号警灯，静等在一个panel里面也是先行后列的编号模式，这个第一行第一个，一行3个，显示逻辑见外面说明，这个配置字符串的意思是，collection>alarm_type=sensor1_r and level=1
+      alarm_1_level: 1 #1号警灯对应的颜色级别，注意这个是用来和color里面alarm_light的颜色对应的
+      alarm_4: "bm1_rms_alarm>alarm_type@sensor4_r;level@2" #2号警灯， 和第二行第一个，
+      alarm_4_level: 2
+      value_1_unit: "g"
+
+      label_2: "轴向振动" # 一共3个label和value
+      value_2: "bm1_rms>sensors.sensor4.z_rms"
+      value_2_alarm: "bm1_rms>sensors.sensor4.z_rms_alarm" #警报级别，用来改变value的字体颜色
+      alarm_2: "bm1_rms_alarm>alarm_type@sensor4_z;level@1"
+      alarm_2_level: 1
+      alarm_5: "bm1_rms_alarm>alarm_type@sensor4_z;level@2"
+      alarm_5_level: 2
+      value_2_unit: "g"
+
+      label_3: "温度" # 一共3个label和value
+      value_3: "bm1_rms>sensors.sensor4.temp"
+      value_3_alarm: "bm1_rms>sensors.sensor4.r_rms_alarm" #警报级别，用来改变value的字体颜色
+      alarm_3: "bm1_rms_alarm>alarm_type@sensor4_temp;level@1"
+      alarm_3_level: 1
+      alarm_6: "bm1_rms_alarm>alarm_type@sensor4_temp;level@2"
+      alarm_6_level: 2
+      value_3_unit: "℃"
+
+    - panel_no: 4 #编号从0开始
+      title: "出料口轴承"
+      label_1: "径向振动" # 一共3个label和value
+      value_1: "bm1_rms>sensors.sensor5.r_rms"
+      value_1_alarm: "bm1_rms>sensors.sensor5.r_rms_alarm" #警报级别，用来改变value的字体颜色
+      alarm_1: "bm1_rms_alarm>alarm_type@sensor5_r;level@1" #1号警灯，静等在一个panel里面也是先行后列的编号模式，这个第一行第一个，一行3个，显示逻辑见外面说明，这个配置字符串的意思是，collection>alarm_type=sensor1_r and level=1
+      alarm_1_level: 1 #1号警灯对应的颜色级别，注意这个是用来和color里面alarm_light的颜色对应的
+      alarm_4: "bm1_rms_alarm>alarm_type@sensor5_r;level@2" #2号警灯， 和第二行第一个，
+      alarm_4_level: 2
+      value_1_unit: "g"
+
+      label_2: "轴向振动" # 一共3个label和value
+      value_2: "bm1_rms>sensors.sensor5.z_rms"
+      value_2_alarm: "bm1_rms>sensors.sensor5.z_rms_alarm" #警报级别，用来改变value的字体颜色
+      alarm_2: "bm1_rms_alarm>alarm_type@sensor5_z;level@1"
+      alarm_2_level: 1
+      alarm_5: "bm1_rms_alarm>alarm_type@sensor5_z;level@2"
+      alarm_5_level: 2
+      value_2_unit: "g"
+
+      label_3: "温度" # 一共3个label和value
+      value_3: "bm1_rms>sensors.sensor5.temp"
+      value_3_alarm: "bm1_rms>sensors.sensor5.r_rms_alarm" #警报级别，用来改变value的字体颜色
+      alarm_3: "bm1_rms_alarm>alarm_type@sensor5_temp;level@1"
+      alarm_3_level: 1
+      alarm_6: "bm1_rms_alarm>alarm_type@sensor5_temp;level@2"
+      alarm_6_level: 2
+      value_3_unit: "℃"
+
+    - panel_no: 5 #编号从0开始
+      title: "进料口轴承"
+      label_1: "径向振动" # 一共3个label和value
+      value_1: "bm1_rms>sensors.sensor6.r_rms"
+      value_1_alarm: "bm1_rms>sensors.sensor6.r_rms_alarm" #警报级别，用来改变value的字体颜色
+      alarm_1: "bm1_rms_alarm>alarm_type@sensor6_r;level@1" #1号警灯，静等在一个panel里面也是先行后列的编号模式，这个第一行第一个，一行3个，显示逻辑见外面说明，这个配置字符串的意思是，collection>alarm_type=sensor1_r and level=1
+      alarm_1_level: 1 #1号警灯对应的颜色级别，注意这个是用来和color里面alarm_light的颜色对应的
+      alarm_4: "bm1_rms_alarm>alarm_type@sensor6_r;level@2" #2号警灯， 和第二行第一个，
+      alarm_4_level: 2
+      value_1_unit: "g"
+
+      label_2: "轴向振动" # 一共3个label和value
+      value_2: "bm1_rms>sensors.sensor6.z_rms"
+      value_2_alarm: "bm1_rms>sensors.sensor6.z_rms_alarm" #警报级别，用来改变value的字体颜色
+      alarm_2: "bm1_rms_alarm>alarm_type@sensor6_z;level@1"
+      alarm_2_level: 1
+      alarm_5: "bm1_rms_alarm>alarm_type@sensor6_z;level@2"
+      alarm_5_level: 2
+      value_2_unit: "g"
+
+      label_3: "温度" # 一共3个label和value
+      value_3: "bm1_rms>sensors.sensor6.temp"
+      value_3_alarm: "bm1_rms>sensors.sensor6.r_rms_alarm" #警报级别，用来改变value的字体颜色
+      alarm_3: "bm1_rms_alarm>alarm_type@sensor6_temp;level@1"
+      alarm_3_level: 1
+      alarm_6: "bm1_rms_alarm>alarm_type@sensor6_temp;level@2"
+      alarm_6_level: 2
+      value_3_unit: "℃"

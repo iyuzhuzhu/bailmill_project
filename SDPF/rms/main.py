@@ -449,8 +449,8 @@ def main():
     config_path = './config.yml'
     name = 'bm1'
     shot = '1110400'
-    # Rms(name, config_path, shot)
-    test_shots_calculate()
+    Rms(name, config_path, shot)
+    # test_shots_calculate()
 
 
 if __name__ == '__main__':

@@ -31,7 +31,7 @@ class Rms:
         # print(sensors_data)
         if not functions.verify_dict_value_all_None(sensors_data):
             self.single_shot_summary(sensors_data, sample_data)
-            # self.plot_model(sensors_data, sample_data)
+            self.plot_model(sensors_data, sample_data)
         # print(self.shot)
 
     def training_model(self):
@@ -449,8 +449,8 @@ def main():
     config_path = './config.yml'
     name = 'bm1'
     shot = '1110400'
-    # Rms(name, config_path, shot)
-    test_shots_calculate()
+    Rms(name, config_path, shot)
+    # test_shots_calculate()
 
 
 if __name__ == '__main__':
