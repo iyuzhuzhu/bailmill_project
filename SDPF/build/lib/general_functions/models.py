@@ -9,6 +9,8 @@ class BasicModel:
         self.config, self.ruamel_yaml = functions.load_yaml(self.config_path)
         self.data_source, self.output_path, self.sensors = (self.config['data_source'], self.config['Inference_path'],
                                                             self.config['sensors'])
+        # print(self.config)
+        self.collection_name = functions.replace_ball_mill_name(self.config['db']['collection'], self.name)
         self.client, self.db = connect_mongodb_database(self.config['db']['connection'], self.config['db']['db_name'])
         self.channels = self.get_sensor_channels()
 
@@ -31,6 +33,8 @@ class BasicModel:
             threshold = float(threshold)
             sensor_index = key.split('_')[2] + "_" + self.model_name
             alarm_index = key.split('_')[2] + "_" + self.model_name + "_alarm"
+            # if single_sensor[sensor_index] >= threshold and key.count('h') > single_sensor[alarm_index]:
+            #     single_sensor[alarm_index] = key.count('h')
             try:
                 if single_sensor[sensor_index] >= threshold and key.count('h') > single_sensor[alarm_index]:
                     single_sensor[alarm_index] = key.count('h')
@@ -49,6 +53,7 @@ class BasicModel:
         threshold_config, _, _ = functions.get_threshold_config(self.config['threshold_config_path'], self.name)
         # window, on, off = alarm_config['window'], alarm_config['on'], alarm_config['off']
         sensor_threshold = threshold_config['sensors_threshold'][sensor]
+        # print(sensor_threshold, single_sensor)
         single_sensor_rms = self.confirm_threshold_exceeded(single_sensor, sensor_threshold)
         return single_sensor
     # def get_is_running_raw_data(self):

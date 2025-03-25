@@ -1,0 +1,47 @@
+save_plot_folder: ai_plot # 图片的保存文件夹
+plots:
+#  sensor1
+  - name: "sensor1" # name show as plot tile
+    plot_channel: "channel0"
+    line_color1: "blue"
+    line_color2: "red"
+    line_width: 3
+    enable_detail: true
+    x_max: 3.6
+    x_min: 3.4
+    y_max: "-"
+    y_min: "-"
+    x_label: "时间 [s]"
+    y_label: "加速度 [g]"
+    title: "x轴方向"
+    output: "sensor1_x轴方向重构图.png" # output file name and path under the output folder
+  - name: "sensor1" # name show as plot tile
+    plot_channel: "channel1"
+    line_color1: "blue"
+    line_color2: "red"
+    line_width: 3
+    enable_detail: true
+    x_max: 3.6
+    x_min: 3.4
+    y_max: "-"
+    y_min: "-"
+    x_label: "时间 [s]"
+    y_label: "加速度 [g]"
+    title: "y轴方向"
+    output: "sensor1_y轴方向重构图.png" # output file name and path under the output folder
+  - name: "sensor1" # name show as plot tile
+    plot_channel: "channel2"
+    line_color1: "blue"
+    line_color2: "red"
+    line_width: 3
+    enable_detail: true
+    x_max: 3.6
+    x_min: 3.4
+    y_max: "-"
+    y_min: "-"
+    x_label: "时间 [s]"
+    y_label: "加速度 [g]"
+    title: "z轴方向"
+    output: "sensor1_z轴方向重构图.png" # output file name and path under the output folder
+
+ 

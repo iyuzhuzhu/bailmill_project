@@ -514,6 +514,21 @@ def ensure_unique_index(collection, index_name):
             pass
 
 
+def save_summary_mongodb(single_summary, db, collection_name, shot):
+    collection = db[collection_name]
+    shot = int(shot)
+    # 确定是否已经创建唯一shot索引， 若无创建唯一索引
+    ensure_unique_index(collection, 'shot')
+    # 检查文档是否已经存在
+    existing_document = collection.find_one({"shot": shot})
+    if existing_document:
+        # 替换现有文档
+        result = collection.replace_one({"shot": shot}, single_summary)
+    else:
+        # 插入新文档
+        result = collection.insert_one(single_summary)
+
+
 def save_single_summary_mongodb(single_summary, address, collection_name, shot, database_name='bm'):
     """
     将数据保存到MongoDB数据库,如果当前炮号已被分析，则对已有的结果进行替换

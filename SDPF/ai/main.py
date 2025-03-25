@@ -28,7 +28,9 @@ class Ai(BasicModel):
             rec_data = self.predict_single_shot(sensors_data)
             # print(rec_data)
             self.plot_model(sensors_data, rec_data, sample_data)
-            self.single_shot_summary(sensors_data, rms_record)
+            sensors = self.calculate_single_sensors_ai(rec_data)
+            print(sensors)
+            self.single_shot_summary(sensors, rms_record)
 
     def get_training_data(self):
         is_running_collection = functions.replace_ball_mill_name(self.config['db']['is_running_collection'], self.name)
@@ -225,6 +227,8 @@ class Ai(BasicModel):
         sensors = {}
         sensors_ai = self.calculate_single_sensors_ai(rec_data)
         for sensor, single_sensor in sensors_ai.items():
+            # if is_running:
+            #     sensors[sensor] = self.get_alarm(sensor, single_sensor)
             # 防止出现传感器出现故障，导致数据没有被采集的故障报错导致程序中断运行
             try:
                 if is_running:
@@ -234,21 +238,22 @@ class Ai(BasicModel):
                 sensors[sensor] = self.get_single_sensor_result(err=True)
         return sensors
 
-    def single_shot_summary(self, sensors_data, rms_record):
+    def single_shot_summary(self, sensors, rms_record):
         """
         汇总当前summary信息
         :return:
         """
         single_shot_summary = rms_record
-        sensors = self.single_shot_sensors_summary(sensors_data, rms_record['is_running'])
+        sensors = self.single_shot_sensors_summary(sensors, rms_record['is_running'])
         single_shot_summary['sensors'] = sensors
         # self.date_time = functions.get_sample_time(sample_data)
         # single_shot_summary = functions.single_shot_summary(self.name, self.shot, sensors, self.date_time
         #                                                     , is_running)
-        address = self.config['db']['connection']
         collection_name = self.config['db']['collection']
-        functions.save_single_summary_mongodb(single_shot_summary, address, collection_name, self.shot,
-                                              database_name=self.config['db']['db_name'])
+        # functions.save_single_summary_mongodb(single_shot_summary, address, collection_name, self.shot,
+        #                                       database_name=self.config['db']['db_name'])
+        print(single_shot_summary)
+        functions.save_summary_mongodb(single_shot_summary, self.db, self.collection_name, self.shot)
         return single_shot_summary
 
 
