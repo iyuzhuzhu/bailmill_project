@@ -28,8 +28,9 @@ class Ai(BasicModel):
             rec_data = self.predict_single_shot(sensors_data)
             # print(rec_data)
             self.plot_model(sensors_data, rec_data, sample_data)
-            print(sensors_data)
-            self.single_shot_summary(sensors_data, rms_record)
+            sensors = self.calculate_single_sensors_ai(rec_data)
+            print(sensors)
+            self.single_shot_summary(sensors, rms_record)
 
     def get_training_data(self):
         is_running_collection = functions.replace_ball_mill_name(self.config['db']['is_running_collection'], self.name)
@@ -50,11 +51,12 @@ class Ai(BasicModel):
         model_path = self.config['model_path']
         model_path = functions.replace_ball_mill_name(model_path, self.name)
         model_path = functions.replace_sensor(model_path, sensor)
+        print(model_path)
         # print(model_path)
         functions.create_folder(model_path)
         folder_path = model_path
-        model_path = Path(model_path) / model_name
-        # print(model_path)
+        model_path = os.path.join(model_path, model_name)
+        print(model_path)
         return model_path, folder_path
 
     def train_models(self):
@@ -237,13 +239,13 @@ class Ai(BasicModel):
                 sensors[sensor] = self.get_single_sensor_result(err=True)
         return sensors
 
-    def single_shot_summary(self, sensors_data, rms_record):
+    def single_shot_summary(self, sensors, rms_record):
         """
         汇总当前summary信息
         :return:
         """
         single_shot_summary = rms_record
-        sensors = self.single_shot_sensors_summary(sensors_data, rms_record['is_running'])
+        sensors = self.single_shot_sensors_summary(sensors, rms_record['is_running'])
         single_shot_summary['sensors'] = sensors
         # self.date_time = functions.get_sample_time(sample_data)
         # single_shot_summary = functions.single_shot_summary(self.name, self.shot, sensors, self.date_time

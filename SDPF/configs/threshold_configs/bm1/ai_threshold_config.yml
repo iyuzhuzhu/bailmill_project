@@ -4,7 +4,7 @@ sensors_threshold: # 判断单个炮数据是否超出阈值
     of_h_r: '0.0'
     of_hh_r: '0.02013168'
     of_h_z: '0.00933888'
-    of_hh_z: '0.0'
+    of_hh_z: '1.0'
   sensor2:
     of_h_r: '0.01137486'
     of_hh_r: '0.01202064'
